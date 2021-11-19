@@ -12,7 +12,7 @@ from pagermaid.utils import alias_command
 
 
 def font(path, size):
-    return ImageFont.truetype(f'{path}ZhuZiAWan-2.ttc', size=size, encoding="utf-8")
+    return ImageFont.truetype(f'{path}SourceHanSans-Normal.ttc', size=size, encoding="utf-8")
 
 
 def cut(obj, sec):
@@ -57,11 +57,11 @@ def yv_lu_process_image(name, text, photo, path):
 
     # 对图片写字
     draw = ImageDraw.Draw(img1)
-    draw.text((60, 10), name, (255, 110, 164), font(path, 18))
+    draw.text((60, 10), name, (79, 173, 115), font(path, 16))
     for i in range(len(text)):
         temp = Image.open(f'{path}p2.png')
         draw = ImageDraw.Draw(temp)
-        draw.text((60, 0), text[i], (255, 255, 255), font(path, 18))
+        draw.text((60, 0), text[i], (40, 41, 35), font(path, 16))
         result.paste(temp, (0, size1[1] + size2[1] * i))
 
     # 粘贴图片
@@ -121,7 +121,7 @@ async def yv_lu(context):
     # 下载资源文件
     for num in range(1, 5):
         if not exists('plugins/yvlu/p' + str(num) + '.png'):
-            re = get('https://raw.githubusercontent.com/Xtao-Labs/PagerMaid_Plugins/master/yvlu/p' + str(num) + '.png')
+            re = get('https://raw.githubusercontent.com/FoKit/PagerMaid_Plugins/modify/yvlu/p' + str(num) + '.png')
             with open('plugins/yvlu/p' + str(num) + '.png', 'wb') as bg:
                 bg.write(re.content)
     if not exists('plugins/yvlu/mask.png'):
@@ -132,10 +132,10 @@ async def yv_lu(context):
         re = get('https://raw.githubusercontent.com/Xtao-Labs/PagerMaid_Plugins/master/yvlu/mask1.png')
         with open('plugins/yvlu/mask1.png', 'wb') as bg:
             bg.write(re.content)
-    if not exists('plugins/yvlu/ZhuZiAWan-2.ttc'):
+    if not exists('plugins/yvlu/SourceHanSans-Normal.ttc'):
         await context.edit('下载字体中。。。')
-        re = get('https://raw.githubusercontent.com/Xtao-Labs/Telegram_PaimonBot/master/assets/fonts/ZhuZiAWan-2.ttc')
-        with open('plugins/yvlu/ZhuZiAWan-2.ttc', 'wb') as bg:
+        re = get('https://raw.githubusercontent.com/FoKit/PagerMaid_Plugins/modify/yvlu/SourceHanSans-Normal.ttc')
+        with open('plugins/yvlu/SourceHanSans-Normal.ttc', 'wb') as bg:
             bg.write(re.content)
     # 获取回复信息
     reply_message = await context.get_reply_message()
