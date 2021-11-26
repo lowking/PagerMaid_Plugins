@@ -33,6 +33,7 @@ positions = {
 notifyStrArr = {
     "6": "踢人",
 }
+extensionConfig = {}
 max_number = len(positions)
 configFilePath = 'plugins/eat/config.json'
 configFileRemoteUrlKey = "eat.configFileRemoteUrl"
@@ -48,7 +49,20 @@ async def eat_it(context, from_user, base, mask, photo, number, layer=0):
     mask1 = Image.new('RGBA', mask_size)
     mask1.paste(photo, mask=mask)
     numberPosition = positions[str(number)]
-    base.paste(mask1, (numberPosition[0], numberPosition[1]), mask1)
+    isSwap = False
+    # 处理头像，放到和背景同样大小画布的特定位置
+    try:
+        isSwap = extensionConfig[str(number)]["isSwap"]
+    except:
+        pass
+    if isSwap:
+        photoBg = Image.new('RGBA', base.size)
+        photoBg.paste(mask1, (numberPosition[0], numberPosition[1]), mask1)
+        photoBg.paste(base, (0, 0), base)
+        base = photoBg
+    else:
+        base.paste(mask1, (numberPosition[0], numberPosition[1]), mask1)
+
 
     # 增加判断是否有第二个头像孔
     isContinue = len(numberPosition) > 2 and layer == 0
@@ -96,7 +110,7 @@ def downloadFileFromUrl(url, filepath):
 
 
 async def loadConfigFile(context, forceDownload=False):
-    global positions, notifyStrArr
+    global positions, notifyStrArr, extensionConfig
     try:
         with open(configFilePath, 'r', encoding='utf8') as cf:
             # 读取已下载的配置文件
@@ -114,6 +128,15 @@ async def loadConfigFile(context, forceDownload=False):
             data = json.loads(json.dumps(remoteConfigJson["notifies"]))
             # 与预设positions合并
             notifyStrArr = mergeDict(notifyStrArr, data)
+
+            # 读取配置文件中的extensionConfig
+            try:
+                data = json.loads(json.dumps(remoteConfigJson["extensionConfig"]))
+                # 与预设extensionConfig合并
+                extensionConfig = mergeDict(extensionConfig, data)
+            except:
+                # 新增扩展配置，为了兼容旧的配置文件更新不出错，无视异常
+                pass
 
             # 读取配置文件中的needDownloadFileList
             data = json.loads(json.dumps(remoteConfigJson["needDownloadFileList"]))

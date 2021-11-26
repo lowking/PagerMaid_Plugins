@@ -1,6 +1,6 @@
 {
   "positions": {
-    "jgg": [287, 42],
+    "jgg": [286, 41],
     "ez": [126, 303, "ez1"],
     "ez1": [288, 92],
     "sh": [83, 274],
@@ -61,9 +61,6 @@
   },
   "extensionConfig": {
     "jgg": {
-      "isSwap": true
-    },
-    "ada": {
       "isSwap": true
     }
   },
