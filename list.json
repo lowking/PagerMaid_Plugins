@@ -202,10 +202,10 @@
         },
         {
             "name": "eat",
-            "version": "1.039",
+            "version": "1.041",
             "section": "profile",
             "maintainer": "SF_PICK",
-            "size": "6.4 kb",
+            "size": "22.3 kb",
             "supported": false,
             "des-short": "生成一张 吃头像 图片。",
             "des": "这个人很懒，什么都没有留下。"
@@ -342,13 +342,13 @@
         },
         {
             "name": "vip",
-            "version": "0.61",
+            "version": "0.62",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "9.8 kb",
             "supported": true,
             "des-short": "vip 捐赠用户功能",
-            "des": "命令：天气：weather weather_pic \nPixiv：pixiv \n百度：baidu Duckduckgo：duckduckgo\n相似动漫：whatanime。与 weather 插件冲突"
+            "des": "命令：天气：weather weather_pic weather_he\nPixiv：pixiv \n百度：baidu Duckduckgo：duckduckgo\n相似动漫：whatanime。与 weather 插件冲突"
         },
         {
             "name": "calculator",
@@ -779,6 +779,16 @@
             "supported": true,
             "des-short": "搜索消息插件",
             "des": "查找最近50条消息中包含指定关键字的消息，并推送相应链接人名及信息至Log频道。\n指令：-findmessage"
+        },
+        {
+            "name": "epic",
+            "version": "1.01",
+            "section": "chat",
+            "maintainer": "xtaodada",
+            "size": "5.80 kb",
+            "supported": true,
+            "des-short": "获取 Epic 喜加一信息",
+            "des": "获取 Epic 喜加一信息。\n指令：-epic"
         }
     ]
 }

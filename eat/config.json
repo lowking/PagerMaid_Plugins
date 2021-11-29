@@ -1,5 +1,7 @@
 {
   "positions": {
+    "jm": [267, 89, "jm1"],
+    "jm1": [51, 87],
     "jgg": [286, 41],
     "ez": [126, 303, "ez1"],
     "ez1": [288, 92],
@@ -31,6 +33,7 @@
     "ada1": [283, 146]
   },
   "notifies": {
+    "jm": "揪咪～",
     "jgg": "举高高",
     "ez": "儿贼～",
     "sh": "鲨画",
@@ -59,6 +62,9 @@
   "extensionConfig": {
     "jgg": {
       "isSwap": true
+    },
+    "jm": {
+      "isSwap": true
     }
   },
   "needDownloadFileList": [
@@ -66,6 +72,9 @@
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/maskqv.png",
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/eatko.png",
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/maskko.png",
+    "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/eatjm.png",
+    "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/maskjm.png",
+    "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/maskjm1.png",
     "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/eatjgg.png",
     "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/maskjgg.png",
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/eattc.png",
