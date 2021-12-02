@@ -1,5 +1,6 @@
 {
   "positions": {
+    "tui": [5, 125],
     "jm": [267, 89, "jm1"],
     "jm1": [51, 87],
     "jgg": [286, 41],
@@ -33,6 +34,7 @@
     "ada1": [283, 146]
   },
   "notifies": {
+    "tui": "tuì～",
     "jm": "揪咪～",
     "jgg": "举高高",
     "ez": "儿贼～",
@@ -64,6 +66,9 @@
     },
     "jm": {
       "isSwap": true
+    },
+    "tui": {
+      "isSwap": true
     }
   },
   "needDownloadFileList": [
@@ -71,6 +76,8 @@
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/maskqv.png",
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/eatko.png",
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/maskko.png",
+    "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/eattui.png",
+    "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/masktui.png",
     "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/eatjm.png",
     "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/maskjm.png",
     "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/maskjm1.png",
