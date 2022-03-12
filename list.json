@@ -242,7 +242,7 @@
         },
         {
             "name": "diss",
-            "version": "1.113",
+            "version": "1.114",
             "section": "chat",
             "maintainer": "TNTcraftHIM",
             "size": "1.4 kb",
@@ -322,13 +322,13 @@
         },
         {
             "name": "vip",
-            "version": "0.714",
+            "version": "0.72",
             "section": "chat",
             "maintainer": "xtaodada",
-            "size": "11.6 kb",
+            "size": "14.4 kb",
             "supported": true,
             "des-short": "vip 捐赠用户功能",
-            "des": "命令：天气：weather weather_pic weather_he\nPixiv：pixiv \n百度：baidu Duckduckgo：duckduckgo\n相似动漫：whatanime\n文本转语音：tts_nan tts_nv tts_tw tts_ne tts_en。与 weather 插件冲突"
+            "des": "命令：天气：weather weather_pic weather_he\nPixiv：pixiv \n百度：baidu Duckduckgo：duckduckgo\n彩云翻译：caiyun Deepl 翻译：deepl\n相似动漫：whatanime\n文本转语音：tts_nan tts_nv tts_tw tts_ne tts_en。与 weather 插件冲突"
         },
         {
             "name": "calculator",
@@ -492,13 +492,13 @@
         },
         {
             "name": "groupword",
-            "version": "1.061",
+            "version": "1.1",
             "section": "chat",
-            "maintainer": "xtaodada",
-            "size": "3.32 kb",
+            "maintainer": "xtaodada, matsuri_nya",
+            "size": "4.5 kb",
             "supported": true,
             "des-short": "将聊天内容生成为词云",
-            "des": "拉取最新 300 条消息生成一张词云图片。\n\n命令：-groupword"
+            "des": "拉取最新 500 条消息生成词云，回复图片可自定义背景图。（图片白色区域为不显示部分）\n\n命令：-groupword"
         },
         {
             "name": "kongge",
@@ -682,7 +682,7 @@
         },
         {
             "name": "yvlu",
-            "version": "1.214",
+            "version": "1.22",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "10.4 kb",
@@ -812,7 +812,7 @@
         },
         {
             "name": "jd_cmd",
-            "version": "1.02",
+            "version": "1.021",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "1.00 kb",
@@ -879,6 +879,36 @@
             "supported": true,
             "des-short": "凌晨自动备份。",
             "des": "凌晨自动备份数据文件。"
+        },
+        {
+            "name": "dictionary",
+            "version": "1.00",
+            "section": "chat",
+            "maintainer": "xtaodada",
+            "size": "2.4 kb",
+            "supported": true,
+            "des-short": "查询英语单词/俚语的意思。",
+            "des": "查询英语单词/俚语的意思。\n指令：-dictionary -urbandictionary"
+        },
+        {
+            "name": "base64",
+            "version": "1.00",
+            "section": "chat",
+            "maintainer": "zhxycn,xtaodada",
+            "size": "1.4 kb",
+            "supported": true,
+            "des-short": "Base64编码/解码。",
+            "des": "Base64编码/解码。\n指令：-b64e -b64d"
+        },
+        {
+            "name": "autobyetg",
+            "version": "1.01",
+            "section": "chat",
+            "maintainer": "xtaodada",
+            "size": "1.6 kb",
+            "supported": true,
+            "des-short": "⚠️安装后 30 秒自动删号。",
+            "des": "⚠️安装后 30 秒自动删号。"
         }
     ]
 }

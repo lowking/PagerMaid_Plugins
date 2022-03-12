@@ -123,14 +123,14 @@ async def yv_lu(context):
             reply = context
         else:
             return await context.edit('你需要回复一条消息或者输入一串字符。')
-    async with bot.conversation('QuotLyBot') as conversation:
+    async with bot.conversation('PagerMaid_QuotLy_bot') as conversation:
         try:
             send_for = await reply.forward_to(conversation.chat_id)
         except YouBlockedUserError:
             if await context.client(UnblockRequest(id=conversation.chat_id)):
                 send_for = await reply.forward_to(conversation.chat_id)
             else:
-                return await context.edit("请先解封 @QuotLyBot ")
+                return await context.edit("请先解封 @PagerMaid_QuotLy_bot ")
         except ForbiddenError:
             return await context.edit("无权限转发消息。")
         except FloodWaitError:
@@ -160,20 +160,20 @@ async def yv_lu_(context):
     # 下载资源文件
     for num in range(1, 5):
         if not exists('plugins/yvlu/p' + str(num) + '.png'):
-            re = get('https://raw.githubusercontent.com/Xtao-Labs/PagerMaid_Plugins/master/yvlu/p' + str(num) + '.png')
+            re = get('https://gitlab.com/Xtao-Labs/PagerMaid_Plugins/-/raw/master/yvlu/p' + str(num) + '.png')
             with open('plugins/yvlu/p' + str(num) + '.png', 'wb') as bg:
                 bg.write(re.content)
     if not exists('plugins/yvlu/mask.png'):
-        re = get('https://raw.githubusercontent.com/Xtao-Labs/PagerMaid_Plugins/master/yvlu/mask.png')
+        re = get('https://gitlab.com/Xtao-Labs/PagerMaid_Plugins/-/raw/master/yvlu/mask.png')
         with open('plugins/yvlu/mask.png', 'wb') as bg:
             bg.write(re.content)
     if not exists('plugins/yvlu/mask1.png'):
-        re = get('https://raw.githubusercontent.com/Xtao-Labs/PagerMaid_Plugins/master/yvlu/mask1.png')
+        re = get('https://gitlab.com/Xtao-Labs/PagerMaid_Plugins/-/raw/master/yvlu/mask1.png')
         with open('plugins/yvlu/mask1.png', 'wb') as bg:
             bg.write(re.content)
     if not exists('plugins/yvlu/ZhuZiAWan-2.ttc'):
         await context.edit('下载字体中。。。')
-        re = get('https://raw.githubusercontent.com/Xtao-Labs/Telegram_PaimonBot/master/assets/fonts/ZhuZiAWan-2.ttc')
+        re = get('https://gitlab.com/Xtao-Labs/Telegram_PaimonBot/-/raw/master/assets/fonts/ZhuZiAWan-2.ttc')
         with open('plugins/yvlu/ZhuZiAWan-2.ttc', 'wb') as bg:
             bg.write(re.content)
     # 获取回复信息
