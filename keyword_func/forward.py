@@ -45,9 +45,6 @@ async def main(context, sender_ids, forward_target):
         if f"{context.sender_id}" in sender_ids or sender_ids == "999":
             reply = await context.get_reply_message()
             if not reply:
-                smsg = await context.edit(f"请回复一条消息！")
-                await sleep(5)
-                await smsg.delete()
                 return ""
             isShowDetail = "sdtl" in context.text
             if isShowDetail:
