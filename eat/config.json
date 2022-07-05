@@ -33,7 +33,8 @@
     "zou": [171, 328, "zou1"],
     "zou1": [444, 339],
     "ada": [223, 314, "ada1"],
-    "ada1": [283, 146]
+    "ada1": [283, 146],
+    "mn": [109, 32]
   },
   "notifies": {
     "tui": "tuì～",
@@ -61,7 +62,8 @@
     "ss": "坑爹啊",
     "ri": "日一下",
     "zou": "揍你哦",
-    "ada": "给爷死"
+    "ada": "给爷死",
+    "mn": "没脑"
   },
   "extensionConfig": {
     "jgg": {
@@ -85,6 +87,8 @@
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/eatkf.png",
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/maskkf.png",
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/maskkf1.png",
+    "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/eatmn.png",
+    "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/maskmn.png",
     "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/eattui.png",
     "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/masktui.png",
     "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/eatjm.png",
