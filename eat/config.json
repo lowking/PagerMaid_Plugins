@@ -63,7 +63,7 @@
     "ri": "日一下",
     "zou": "揍你哦",
     "ada": "给爷死",
-    "mn": "脑残"
+    "nc": "脑残"
   },
   "extensionConfig": {
     "jgg": {
@@ -87,8 +87,8 @@
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/eatkf.png",
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/maskkf.png",
     "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/maskkf1.png",
-    "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/eatmn.png",
-    "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/maskmn.png",
+    "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/eatnc.png",
+    "https://raw.githubusercontent.com/Fokit/PagerMaid_Plugins/modify/eat/masknc.png",
     "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/eattui.png",
     "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/masktui.png",
     "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/modify/eat/eatjm.png",
