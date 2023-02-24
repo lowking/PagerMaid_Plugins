@@ -1,8 +1,8 @@
 """ PagerMaid module to handle sticker collection. """
-
 from PIL import Image
 from os.path import exists
 from os import remove
+
 from requests import get
 from random import randint
 
@@ -15,14 +15,14 @@ from telethon.errors.rpcerrorlist import ChatSendStickersForbiddenError
 from struct import error as StructError
 from pagermaid.listener import listener
 from pagermaid.utils import alias_command
-from pagermaid import redis, config, bot
+from pagermaid import redis, config, bot, log
 from collections import defaultdict
 import json
 
 try:
     git_source = config['git_source']
 except:
-    git_source = "https://raw.githubusercontent.com/Xtao-Labs/PagerMaid_Plugins/master/"
+    git_source = "https://raw.githubusercontent.com/lowking/PagerMaid_Plugins/master/"
 positions = {
     "1": [297, 288],
     "2": [85, 368],
@@ -218,72 +218,27 @@ async def eat(context: NewMessage.Event):
     if len(context.parameter) > 2:
         await context.edit("出错了呜呜呜 ~ 无效的参数。")
         return
-    diu_round = False
-    from_user = user_object = context.sender
+    number, diu_round = await getConfigAndDealCommand(context)
+    if not number:
+        return
+
+    if redis.get(configFileRemoteUrlKey) and len(notifyStrArr) <= 6:
+        await initConfig(context)
+    try:
+        notifyStr = notifyStrArr[str(number)]
+    except:
+        notifyStr = "吃头像"
+    await context.edit(f"正在生成 {notifyStr} 图片中 . . .")
+    from_user = context.sender
     from_user_id = await get_full_id(from_user)
-    if context.reply_to_msg_id:
-        reply_message = await context.get_reply_message()
-        try:
-            user_id = reply_message.sender_id
-        except AttributeError:
-            await context.edit("出错了呜呜呜 ~ 无效的参数。")
-            return
-        if user_id > 0:
-            target_user = await context.client(GetFullUserRequest(user_id))
-            target_user_id = target_user.user.id
-        else:
-            target_user = await context.client(GetFullChannelRequest(user_id))
-            target_user_id = target_user.full_chat.id
-    else:
-        user_raw = ""
-        if len(context.parameter) == 1 or len(context.parameter) == 2:
-            user_raw = user = context.parameter[0]
-            if user.isnumeric():
-                user = int(user)
-        else:
-            user = user_object.id
-        if context.message.entities is not None:
-            if isinstance(context.message.entities[0], MessageEntityMentionName):
-                target_user = await context.client(GetFullUserRequest(context.message.entities[0].user_id))
-                target_user_id = target_user.user.id
-            elif isinstance(context.message.entities[0], MessageEntityPhone):
-                if user > 0:
-                    target_user = await context.client(GetFullUserRequest(user))
-                    target_user_id = target_user.user.id
-                else:
-                    target_user = await context.client(GetFullChannelRequest(user))
-                    target_user_id = target_user.full_chat.id
-            elif isinstance(context.message.entities[0], MessageEntityBotCommand):
-                target_user = await context.client(GetFullUserRequest(user_object.id))
-                target_user_id = target_user.user.id
-            else:
-                return await context.edit("出错了呜呜呜 ~ 参数错误。")
-        elif user_raw[:1] in [".", "/", "-", "!"]:
-            target_user_id = await get_full_id(from_user)
-        else:
-            try:
-                user_object = await context.client.get_entity(user)
-                target_user_id = await get_full_id(user_object)
-            except (TypeError, ValueError, OverflowError, StructError) as exception:
-                if str(exception).startswith("Cannot find any entity corresponding to"):
-                    await context.edit("出错了呜呜呜 ~ 指定的用户不存在。")
-                    return
-                if str(exception).startswith("No user has"):
-                    await context.edit("出错了呜呜呜 ~ 指定的道纹不存在。")
-                    return
-                if str(exception).startswith("Could not find the input entity for") or isinstance(exception,
-                                                                                                  StructError):
-                    await context.edit("出错了呜呜呜 ~ 无法通过此 UserID 找到对应的用户。")
-                    return
-                if isinstance(exception, OverflowError):
-                    await context.edit("出错了呜呜呜 ~ 指定的 UserID 已超出长度限制，您确定输对了？")
-                    return
-                raise exception
-    photo = await context.client.download_profile_photo(
-        target_user_id,
-        "plugins/eat/" + str(target_user_id) + ".jpg",
-        download_big=True
-    )
+    target_user_id = await getTargetUserId(context, from_user)
+    initConfigResult = await initConfig(context)
+    if not target_user_id or initConfigResult == 0:
+        return
+    photo = await getTargetUserAvatar(context, target_user_id)
+    if not photo:
+        await context.edit("此用户未设置头像或头像对您不可见。")
+        return
 
     reply_to = context.message.reply_to_msg_id
     if exists("plugins/eat/" + str(target_user_id) + ".jpg"):
@@ -297,171 +252,31 @@ async def eat(context: NewMessage.Event):
                 re = get(f'{git_source}eat/mask' + str(num) + '.png')
                 with open('plugins/eat/mask' + str(num) + '.png', 'wb') as ms:
                     ms.write(re.content)
-        number = randint(1, max_number)
-        try:
-            p1 = 0
-            p2 = 0
-            if len(context.parameter) == 1:
-                p1 = context.parameter[0]
-                if p1[0] == ".":
-                    diu_round = True
-                    if len(p1) > 1:
-                        try:
-                            p2 = int("".join(p1[1:]))
-                        except:
-                            # 可能也有字母的参数
-                            p2 = "".join(p1[1:])
-                elif p1[0] == "-":
-                    if len(p1) > 1:
-                        try:
-                            p2 = int("".join(p1[1:]))
-                        except:
-                            # 可能也有字母的参数
-                            p2 = "".join(p1[1:])
-                    if p2:
-                        redis.set("eat.default-config", p2)
-                        await context.edit(f"已经设置默认配置为：{p2}")
-                    else:
-                        redis.delete("eat.default-config")
-                        await context.edit(f"已经清空默认配置")
-                    return
-                elif p1[0] == "/":
-                    await context.edit(f"正在更新远程配置文件")
-                    if len(p1) > 1:
-                        # 获取参数中的url
-                        p2 = "".join(p1[1:])
-                        if p2 == "delete":
-                            redis.delete(configFileRemoteUrlKey)
-                            await context.edit(f"已清空远程配置文件url")
-                            return
-                        if p2.startswith("http"):
-                            # 下载文件
-                            if downloadFileFromUrl(p2, configFilePath) != 0:
-                                await context.edit(f"下载配置文件异常，请确认url是否正确")
-                                return
-                            else:
-                                # 下载成功，加载配置文件
-                                redis.set(configFileRemoteUrlKey, p2)
-                                if await loadConfigFile(context, True) != 0:
-                                    await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
-                                    return
-                                else:
-                                    await context.edit(f"下载并加载配置文件成功")
-                        else:
-                            # 根据传入模版id更新模版配置，多个用"，"或者","隔开
-                            # 判断redis是否有保存配置url
-
-                            splitStr = "，"
-                            if "," in p2:
-                                splitStr = ","
-                            ids = p2.split(splitStr)
-                            if len(ids) > 0:
-                                # 下载文件
-                                configFileRemoteUrl = redis.get(configFileRemoteUrlKey)
-                                if configFileRemoteUrl:
-                                    if downloadFileFromUrl(configFileRemoteUrl, configFilePath) != 0:
-                                        await context.edit(f"下载配置文件异常，请确认url是否正确")
-                                        return
-                                    else:
-                                        # 下载成功，更新对应配置
-                                        if await loadConfigFile(context) != 0:
-                                            await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
-                                            return
-                                        else:
-                                            await downloadFileByIds(ids, context)
-                                else:
-                                    await context.edit(f"你没有订阅远程配置文件，更新个🔨")
-                    else:
-                        # 没传url直接更新
-                        if await updateConfig(context) != 0:
-                            await context.edit(f"更新配置文件异常，请确认是否订阅远程配置文件，或从远程下载的配置文件格式是否正确")
-                            return
-                        else:
-                            await context.edit(f"从远程更新配置文件成功")
-                    return
-                elif p1[0] == "！" or p1[0] == "!":
-                    # 加载配置
-                    if exists(configFilePath):
-                        if await loadConfigFile(context) != 0:
-                            await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
-                            return
-                    txt = ""
-                    if len(positions) > 0:
-                        noShowList = []
-                        for key in positions:
-                            txt = f"{txt}，{key}"
-                            if len(positions[key]) > 2:
-                                noShowList.append(positions[key][2])
-                        for key in noShowList:
-                            txt = txt.replace(f"，{key}", "")
-                        if txt != "":
-                            txt = txt[1:]
-                    await context.edit(f"目前已有的模版列表如下：\n{txt}")
-                    return
-            defaultConfig = redis.get("eat.default-config")
-            if isinstance(p2, str):
-                number = p2
-            elif isinstance(p2, int) and p2 > 0:
-                number = int(p2)
-            elif not diu_round and ((isinstance(p1, int) and int(p1) > 0) or isinstance(p1, str)):
-                try:
-                    number = int(p1)
-                except:
-                    number = p1
-            elif defaultConfig:
-                try:
-                    defaultConfig = defaultConfig.decode()
-                    number = int(defaultConfig)
-                except:
-                    number = str(defaultConfig)
-                    # 支持配置默认是倒立的头像
-                    if number.startswith("."):
-                        diu_round = True
-                        number = number[1:]
-
-        except:
-            number = randint(1, max_number)
-
-        # 加载配置
-        if exists(configFilePath):
-            if await loadConfigFile(context) != 0:
-                await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
-                return
-
-        try:
-            notifyStr = notifyStrArr[str(number)]
-        except:
-            notifyStr = "吃头像"
-        await context.edit(f"正在生成 {notifyStr} 图片中 . . .")
-        markImg = Image.open("plugins/eat/" + str(target_user_id) + ".jpg")
-        try:
-            eatImg = Image.open("plugins/eat/eat" + str(number) + ".png")
-            maskImg = Image.open("plugins/eat/mask" + str(number) + ".png")
-        except:
-            await context.edit(f"图片模版加载出错，请检查并更新配置：{str(number)}")
-            return
-
-        if diu_round:
-            markImg = markImg.rotate(180)  # 对图片进行旋转
-        try:
-            number = str(number)
-        except:
-            pass
-        result = await eat_it(context, from_user_id, eatImg, maskImg, markImg, number)
-        result.save('plugins/eat/eat.webp')
-        target_file = await context.client.upload_file("plugins/eat/eat.webp")
-        try:
-            remove("plugins/eat/" + str(target_user_id) + ".jpg")
-            remove("plugins/eat/" + str(target_user_id) + ".png")
-            remove("plugins/eat/" + str(from_user_id) + ".jpg")
-            remove("plugins/eat/" + str(from_user_id) + ".png")
-            remove("plugins/eat/eat.webp")
-            remove(photo)
-        except:
-            pass
     else:
         await context.edit("此用户未设置头像或头像对您不可见。")
         return
+    markImg = Image.open("plugins/eat/" + str(target_user_id) + ".jpg")
+    try:
+        eatImg = Image.open("plugins/eat/eat" + str(number) + ".png")
+        maskImg = Image.open("plugins/eat/mask" + str(number) + ".png")
+    except:
+        await context.edit(f"图片模版加载出错，请检查并更新配置：{str(number)}")
+        return
+
+    if diu_round:
+        markImg = markImg.rotate(180)  # 对图片进行旋转
+    result = await eat_it(context, from_user_id, eatImg, maskImg, markImg, number)
+    result.save('plugins/eat/eat.webp')
+    target_file = await context.client.upload_file("plugins/eat/eat.webp")
+    try:
+        remove("plugins/eat/" + str(target_user_id) + ".jpg")
+        remove("plugins/eat/" + str(target_user_id) + ".png")
+        remove("plugins/eat/" + str(from_user_id) + ".jpg")
+        remove("plugins/eat/" + str(from_user_id) + ".png")
+        remove("plugins/eat/eat.webp")
+        remove(photo)
+    except:
+        pass
     if reply_to:
         try:
             await context.client.send_file(
@@ -501,3 +316,248 @@ async def eat(context: NewMessage.Event):
             await context.edit("此用户未设置头像或头像对您不可见。")
         except ChatSendStickersForbiddenError:
             await context.edit("此群组无法发送贴纸。")
+
+
+async def initConfig(context):
+    # 加载配置
+    if exists(configFilePath):
+        if await loadConfigFile(context) != 0:
+            await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
+            return 0
+    return 1
+
+
+async def getConfigAndDealCommand(context):
+    diu_round = False
+    number = randint(1, max_number)
+    try:
+        p1 = 0
+        p2 = 0
+        if len(context.parameter) >= 1:
+            p1 = context.parameter[0]
+            if p1[0] == ".":
+                diu_round = True
+                if len(p1) > 1:
+                    try:
+                        p2 = int("".join(p1[1:]))
+                    except:
+                        # 可能也有字母的参数
+                        p2 = "".join(p1[1:])
+            elif p1[0] == "-":
+                if len(p1) > 1:
+                    try:
+                        p2 = int("".join(p1[1:]))
+                    except:
+                        # 可能也有字母的参数
+                        p2 = "".join(p1[1:])
+                if p2:
+                    redis.set("eat.default-config", p2)
+                    await context.edit(f"已经设置默认配置为：{p2}")
+                else:
+                    redis.delete("eat.default-config")
+                    await context.edit(f"已经清空默认配置")
+                return None, diu_round
+            elif p1[0] == "/":
+                await context.edit(f"正在更新远程配置文件")
+                if len(p1) > 1:
+                    # 获取参数中的url
+                    p2 = "".join(p1[1:])
+                    if p2 == "delete":
+                        redis.delete(configFileRemoteUrlKey)
+                        await context.edit(f"已清空远程配置文件url")
+                        return
+                    if p2.startswith("http"):
+                        # 下载文件
+                        if downloadFileFromUrl(p2, configFilePath) != 0:
+                            await context.edit(f"下载配置文件异常，请确认url是否正确")
+                            return None, diu_round
+                        else:
+                            # 下载成功，加载配置文件
+                            redis.set(configFileRemoteUrlKey, p2)
+                            if await loadConfigFile(context, True) != 0:
+                                await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
+                                return None, diu_round
+                            else:
+                                await context.edit(f"下载并加载配置文件成功")
+                    else:
+                        # 根据传入模版id更新模版配置，多个用"，"或者","隔开
+                        # 判断redis是否有保存配置url
+
+                        splitStr = "，"
+                        if "," in p2:
+                            splitStr = ","
+                        ids = p2.split(splitStr)
+                        if len(ids) > 0:
+                            # 下载文件
+                            configFileRemoteUrl = redis.get(configFileRemoteUrlKey)
+                            if configFileRemoteUrl:
+                                if downloadFileFromUrl(configFileRemoteUrl, configFilePath) != 0:
+                                    await context.edit(f"下载配置文件异常，请确认url是否正确")
+                                    return None, diu_round
+                                else:
+                                    # 下载成功，更新对应配置
+                                    if await loadConfigFile(context) != 0:
+                                        await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
+                                        return None, diu_round
+                                    else:
+                                        await downloadFileByIds(ids, context)
+                            else:
+                                await context.edit(f"你没有订阅远程配置文件，更新个🔨")
+                else:
+                    # 没传url直接更新
+                    if await updateConfig(context) != 0:
+                        await context.edit(f"更新配置文件异常，请确认是否订阅远程配置文件，或从远程下载的配置文件格式是否正确")
+                        return None, diu_round
+                    else:
+                        await context.edit(f"从远程更新配置文件成功")
+                return None, diu_round
+            elif p1[0] == "！" or p1[0] == "!":
+                # 加载配置
+                if exists(configFilePath):
+                    if await loadConfigFile(context) != 0:
+                        await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
+                        return None, diu_round
+                txt = ""
+                if len(positions) > 0:
+                    noShowList = []
+                    for key in positions:
+                        txt = f"{txt}，{key}"
+                        if len(positions[key]) > 2:
+                            noShowList.append(positions[key][2])
+                    for key in noShowList:
+                        txt = txt.replace(f"，{key}", "")
+                    if txt != "":
+                        txt = txt[1:]
+                await context.edit(f"目前已有的模版列表如下：\n{txt}")
+                return None, diu_round
+        defaultConfig = redis.get("eat.default-config")
+        if defaultConfig:
+            try:
+                defaultConfig = defaultConfig.decode()
+                defaultConfig = int(defaultConfig)
+            except:
+                defaultConfig = str(defaultConfig)
+        if isinstance(p2, str):
+            number = p2
+        elif isinstance(p2, int) and p2 > 0:
+            number = int(p2)
+        elif not diu_round and ((isinstance(p1, int) and int(p1) > 0) or isinstance(p1, str)):
+            try:
+                number = int(p1)
+            except:
+                number = p1
+        elif defaultConfig:
+            number = defaultConfig
+        if str(number).isnumeric() and (max_number < number or number < 0):
+            # 如果同时指定了id和模版
+            if len(context.parameter) >= 2:
+                number = context.parameter[1]
+            else:
+                number = defaultConfig
+        if str(number).startswith("."):
+            diu_round = True
+            number = number[1:]
+    except Exception as e:
+        number = randint(1, max_number)
+        await log(f'解析异常：{e}')
+    try:
+        number = str(number)
+    except:
+        pass
+
+    return number, diu_round
+
+
+async def getTargetUserId(context, from_user):
+    if context.reply_to_msg_id:
+        # 有回复消息的话，获取回复消息的用户信息
+        reply_message = await context.get_reply_message()
+        target_user, target_user_id = await getTargetUserByContextAndReply(context, reply_message)
+    else:
+        user_raw = ""
+        if len(context.parameter) == 1 or len(context.parameter) == 2:
+            # 命令后面带有数字参数，用户设置成输入的数字
+            user_raw = context.parameter[0]
+            user = context.parameter[0]
+            if user.isnumeric():
+                user = int(user)
+            else:
+                user = from_user.id
+        else:
+            # 用户设置成发送者
+            user = from_user.id
+        if context.message.entities is not None:
+            target_user, target_user_id = await getTargetUserByContextEntities(context, user, from_user)
+        elif user_raw[:1] in [".", "/", "-", "!"]:
+            target_user_id = await get_full_id(from_user)
+        else:
+            target_user_id = await getTargetUserByClientEntity(context, user)
+    return target_user_id
+
+
+async def getTargetUserAvatar(context, target_user_id):
+    try:
+        photo = await context.client.download_profile_photo(
+            target_user_id,
+            "plugins/eat/" + str(target_user_id) + ".jpg",
+            download_big=True
+        )
+    except:
+        return None
+    return photo
+
+
+async def getTargetUserByContextEntities(context, user, user_object):
+    if isinstance(context.message.entities[0], MessageEntityMentionName):
+        target_user = await context.client(GetFullUserRequest(context.message.entities[0].user_id))
+        target_user_id = target_user.user.id
+    elif isinstance(context.message.entities[0], MessageEntityPhone):
+        if user > 0:
+            target_user = await context.client(GetFullUserRequest(user))
+            target_user_id = target_user.user.id
+        else:
+            target_user = await context.client(GetFullChannelRequest(user))
+            target_user_id = target_user.full_chat.id
+    elif isinstance(context.message.entities[0], MessageEntityBotCommand):
+        target_user = await context.client(GetFullUserRequest(user_object.id))
+        target_user_id = target_user.user.id
+    else:
+        return await context.edit("出错了呜呜呜 ~ 参数错误。")
+    return target_user, target_user_id
+
+
+async def getTargetUserByContextAndReply(context, reply_message):
+    try:
+        user_id = reply_message.sender_id
+    except AttributeError:
+        await context.edit("出错了呜呜呜 ~ 无效的参数。")
+        return
+    if user_id > 0:
+        target_user = await context.client(GetFullUserRequest(user_id))
+        target_user_id = target_user.user.id
+    else:
+        target_user = await context.client(GetFullChannelRequest(user_id))
+        target_user_id = target_user.full_chat.id
+    return target_user, target_user_id
+
+
+async def getTargetUserByClientEntity(context, user):
+    try:
+        user_object = await context.client.get_entity(user)
+        target_user_id = await get_full_id(user_object)
+        return target_user_id
+    except (TypeError, ValueError, OverflowError, StructError) as exception:
+        if str(exception).startswith("Cannot find any entity corresponding to"):
+            await context.edit("出错了呜呜呜 ~ 指定的用户不存在。")
+            return
+        if str(exception).startswith("No user has"):
+            await context.edit("出错了呜呜呜 ~ 指定的道纹不存在。")
+            return
+        if str(exception).startswith("Could not find the input entity for") or isinstance(exception,
+                                                                                          StructError):
+            await context.edit("出错了呜呜呜 ~ 无法通过此 UserID 找到对应的用户。")
+            return
+        if isinstance(exception, OverflowError):
+            await context.edit("出错了呜呜呜 ~ 指定的 UserID 已超出长度限制，您确定输对了？")
+            return
+        raise exception
