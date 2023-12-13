@@ -421,14 +421,20 @@ async def getConfigAndDealCommand(context):
                 if len(positions) > 0:
                     noShowList = []
                     for key in positions:
-                        txt = f"{txt}，{key}"
+                        try:
+                            notifyStr = f"{notifyStrArr[key]}"
+                        except:
+                            notifyStr = ""
+                        if notifyStr != "":
+                            sKey = key.ljust(9, " ")
+                            txt = f"{txt}\n{sKey}{notifyStr}"
+                        else:
+                            txt = f"{txt}\n{key}"
                         if len(positions[key]) > 2:
                             noShowList.append(positions[key][2])
                     for key in noShowList:
-                        txt = txt.replace(f"，{key}", "")
-                    if txt != "":
-                        txt = txt[1:]
-                await context.edit(f"目前已有的模版列表如下：\n{txt}")
+                        txt = txt.replace(f"\n{key}", "")
+                await context.edit(f"目前已有的模版列表如下：{txt}")
                 return None, diu_round
         defaultConfig = redis.get("eat.default-config")
         if defaultConfig:
