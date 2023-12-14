@@ -1,23 +1,23 @@
 """ PagerMaid module to handle sticker collection. """
-from PIL import Image
-from os.path import exists
+import json
+import re
+from collections import defaultdict
 from os import remove
-
-from requests import get
+from os.path import exists
 from random import randint
-
-from telethon.events import NewMessage
-from telethon.tl.functions.users import GetFullUserRequest
-from telethon.tl.functions.channels import GetFullChannelRequest
-from telethon.tl.patched import Message
-from telethon.tl.types import Channel, MessageEntityMentionName, MessageEntityPhone, MessageEntityBotCommand
-from telethon.errors.rpcerrorlist import ChatSendStickersForbiddenError
 from struct import error as StructError
+
+from PIL import Image
+from pagermaid import redis, config, bot, log
 from pagermaid.listener import listener
 from pagermaid.utils import alias_command
-from pagermaid import redis, config, bot, log
-from collections import defaultdict
-import json
+from requests import get
+from telethon.errors.rpcerrorlist import ChatSendStickersForbiddenError
+from telethon.events import NewMessage
+from telethon.tl.functions.channels import GetFullChannelRequest
+from telethon.tl.functions.users import GetFullUserRequest
+from telethon.tl.patched import Message
+from telethon.tl.types import Channel, MessageEntityMentionName, MessageEntityPhone, MessageEntityBotCommand
 
 try:
     git_source = config['git_source']
@@ -94,22 +94,52 @@ async def eat_it(context, uid, base, mask, photo, number, layer=0):
     return base
 
 
-async def updateConfig(context):
+async def updateConfig(context, forceDownload=False):
+    ret = 0
     configFileRemoteUrl = redis.get(configFileRemoteUrlKey)
     if configFileRemoteUrl:
-        if downloadFileFromUrl(configFileRemoteUrl, configFilePath) != 0:
-            redis.set(configFileRemoteUrlKey, configFileRemoteUrl)
-            return -1
-        else:
-            return await loadConfigFile(context, True)
-    return 0
+        if not exists(configFilePath):
+            f = open(configFilePath, 'w')
+            f.close()
+        urls = configFileRemoteUrl.decode().split(",")
+        try:
+            with open(configFilePath, 'r', encoding="utf-8") as source:
+                localConfigJson = json.load(source)
+        except:
+            localConfigJson = json.loads('{"positions": {}, "notifies": {}, "extensionConfig": {}, '
+                                         '"needDownloadFileList": []}')
+        with open(configFilePath, 'w+', encoding="utf-8") as ms:
+            for url in urls:
+                try:
+                    re = get(url)
+                except:
+                    ret = -1
+                    break
+                remoteConfigJson = json.loads(re.content)
+                # 将文件内容转成json，与下载的内容合并
+                localStr = json.dumps(localConfigJson["positions"])
+                remoteStr = json.dumps(remoteConfigJson["positions"])
+                localConfigJson['positions'] = mergeDict(json.loads(localStr), json.loads(remoteStr))
+                localStr = json.dumps(localConfigJson["notifies"])
+                remoteStr = json.dumps(remoteConfigJson["notifies"])
+                localConfigJson['notifies'] = mergeDict(json.loads(localStr), json.loads(remoteStr))
+                localStr = json.dumps(localConfigJson["extensionConfig"])
+                remoteStr = json.dumps(remoteConfigJson["extensionConfig"])
+                localConfigJson['extensionConfig'] = mergeDict(json.loads(localStr), json.loads(remoteStr))
+                localStr = json.dumps(localConfigJson["needDownloadFileList"])
+                remoteStr = json.dumps(remoteConfigJson["needDownloadFileList"])
+                localConfigJson['needDownloadFileList'] = list(set(json.loads(localStr)).union(set(json.loads(remoteStr))))
+            ms.write(json.dumps(localConfigJson, ensure_ascii=False))
+        if ret == 0:
+            return await loadConfigFile(context, forceDownload)
+    return ret
 
 
 def downloadFileFromUrl(url, filepath):
     try:
         re = get(url)
         with open(filepath, 'wb') as ms:
-            ms.write(re.content)
+                ms.write(re.content)
     except:
         return -1
     return 0
@@ -147,15 +177,15 @@ async def loadConfigFile(context, forceDownload=False):
             # 读取配置文件中的needDownloadFileList
             data = json.loads(json.dumps(remoteConfigJson["needDownloadFileList"]))
             # 下载列表中的文件
-            for fileurl in data:
+            for fileUrl in data:
                 try:
-                    fsplit = fileurl.split("/")
+                    fsplit = fileUrl.split("/")
                     filePath = f"plugins/eat/{fsplit[len(fsplit) - 1]}"
                     if not exists(filePath) or forceDownload:
-                        downloadFileFromUrl(fileurl, filePath)
+                        downloadFileFromUrl(fileUrl, filePath)
 
                 except:
-                    await context.edit(f"下载文件异常，url：{fileurl}")
+                    await context.edit(f"下载文件异常，url：{fileUrl}")
                     return -1
     except:
         return -1
@@ -185,7 +215,7 @@ async def downloadFileByIds(ids, context):
                 try:
                     fsplit = fileurl.split("/")
                     fileFullName = fsplit[len(fsplit) - 1]
-                    fileName = fileFullName.split(".")[0].replace("eat", "").replace("mask", "")
+                    fileName = re.sub(r"\d+", "", fileFullName).split(".")[0].replace("eat", "").replace("mask", "")
                     if f',{fileName},' in idsStr:
                         filePath = f"plugins/eat/{fileFullName}"
                         if downloadFileFromUrl(fileurl, filePath) == 0:
@@ -209,7 +239,8 @@ async def downloadFileByIds(ids, context):
           description="生成一张 吃头像 图片\n"
                       "可选：当第二个参数是数字时，读取预存的配置；\n\n"
                       "当第二个参数是.开头时，头像旋转180°，并且判断r后面是数字则读取对应的配置生成\n\n"
-                      "当第二个参数是/开头时，在/后面加url则从url下载配置文件保存到本地，如果就一个/，则直接更新配置文件，删除则是/delete；或者/后面加模版id可以手动更新指定模版配置\n\n"
+                      "当第二个参数是/开头时，在/后面加url则从url下载配置文件保存到本地，如果就一个/，则直接更新配置文件，删除则是/delete；或者/后面加模版id"
+                      "可以手动更新指定模版配置；如果想强制重新下载配置的所有图片，打//即可\n\n "
                       "当第二个参数是-开头时，在-后面加上模版id，即可设置默认模版-eat直接使用该模版，删除默认模版是-eat -\n\n"
                       "当第二个参数是!或者！开头时，列出当前可用模版",
           parameters="<username/uid> [随意内容]")
@@ -359,61 +390,55 @@ async def getConfigAndDealCommand(context):
                 return None, diu_round
             elif p1[0] == "/":
                 await context.edit(f"正在更新远程配置文件")
-                if len(p1) > 1:
-                    # 获取参数中的url
-                    p2 = "".join(p1[1:])
-                    if p2 == "delete":
-                        redis.delete(configFileRemoteUrlKey)
-                        await context.edit(f"已清空远程配置文件url")
-                        return
-                    if p2.startswith("http"):
-                        # 下载文件
-                        if downloadFileFromUrl(p2, configFilePath) != 0:
-                            await context.edit(f"下载配置文件异常，请确认url是否正确")
-                            return None, diu_round
-                        else:
-                            # 下载成功，加载配置文件
-                            redis.set(configFileRemoteUrlKey, p2)
-                            if await loadConfigFile(context, True) != 0:
-                                await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
-                                return None, diu_round
-                            else:
-                                await context.edit(f"下载并加载配置文件成功")
+                # 获取参数中的url
+                p2 = "".join(p1[1:])
+                if p2 == "delete":
+                    redis.delete(configFileRemoteUrlKey)
+                    await context.edit(f"已清空远程配置文件url")
+                elif p2.startswith("http"):
+                    # 下载文件
+                    configFileRemoteUrl = redis.get(configFileRemoteUrlKey)
+                    if configFileRemoteUrl:
+                        configFileRemoteUrl = configFileRemoteUrl.decode()
+                        if p2 not in configFileRemoteUrl:
+                            redis.set(configFileRemoteUrlKey, f"{p2},{configFileRemoteUrl}")
                     else:
-                        # 根据传入模版id更新模版配置，多个用"，"或者","隔开
-                        # 判断redis是否有保存配置url
-
-                        splitStr = "，"
-                        if "," in p2:
-                            splitStr = ","
-                        ids = p2.split(splitStr)
-                        if len(ids) > 0:
-                            # 下载文件
-                            configFileRemoteUrl = redis.get(configFileRemoteUrlKey)
-                            if configFileRemoteUrl:
-                                if downloadFileFromUrl(configFileRemoteUrl, configFilePath) != 0:
-                                    await context.edit(f"下载配置文件异常，请确认url是否正确")
-                                    return None, diu_round
-                                else:
-                                    # 下载成功，更新对应配置
-                                    if await loadConfigFile(context) != 0:
-                                        await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
-                                        return None, diu_round
-                                    else:
-                                        await downloadFileByIds(ids, context)
-                            else:
-                                await context.edit(f"你没有订阅远程配置文件，更新个🔨")
-                else:
-                    # 没传url直接更新
-                    if await updateConfig(context) != 0:
-                        await context.edit(f"更新配置文件异常，请确认是否订阅远程配置文件，或从远程下载的配置文件格式是否正确")
+                        redis.set(configFileRemoteUrlKey, p2)
+                    if await updateConfig(context, False) != 0:
+                        configFileRemoteUrl = configFileRemoteUrl.decode().replace(",", "\n")
+                        await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确:\n{configFileRemoteUrl}")
+                    else:
+                        await context.edit(f"下载并加载配置文件成功")
+                elif len(p2) == 1 and p2 == "/":
+                    configFileRemoteUrl = redis.get(configFileRemoteUrlKey)
+                    if not configFileRemoteUrl:
+                        await context.edit(f"你没有订阅远程配置文件，更新个🔨")
                         return None, diu_round
+                    configFileRemoteUrl = configFileRemoteUrl.decode().replace(",", "\n")
+                    if await updateConfig(context, True) != 0:
+                        await context.edit(f"更新配置文件异常，请确认从远程下载的配置文件格式是否正确:\n{configFileRemoteUrl}")
                     else:
                         await context.edit(f"从远程更新配置文件成功")
+                else:
+                    # 根据传入模版id更新模版配置，多个用"，"或者","隔开
+                    splitStr = "，"
+                    if "," in p2:
+                        splitStr = ","
+                    ids = p2.split(splitStr)
+                    if len(ids) > 0:
+                        configFileRemoteUrl = redis.get(configFileRemoteUrlKey)
+                        if not configFileRemoteUrl:
+                            await context.edit(f"你没有订阅远程配置文件，更新个🔨")
+                            return None, diu_round
+                        configFileRemoteUrl = configFileRemoteUrl.decode().replace(",", "\n")
+                        if await updateConfig(context, False) != 0:
+                            await context.edit(f"更新配置文件异常，请确认从远程下载的配置文件格式是否正确:\n{configFileRemoteUrl}")
+                        else:
+                            await downloadFileByIds(ids, context)
                 return None, diu_round
             elif p1[0] == "！" or p1[0] == "!":
                 # 加载配置
-                if exists(configFilePath):
+                if exists(configFilePath) and len(positions) == 6:
                     if await loadConfigFile(context) != 0:
                         await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
                         return None, diu_round
