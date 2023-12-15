@@ -34,7 +34,10 @@ positions = {
 notifyStrArr = {
     "6": "踢人",
 }
+# json中的扩展配置
 extensionConfig = {}
+# 指令接收到的扩展属性
+prop = {}
 max_number = len(positions)
 configFilePath = 'plugins/eat/config.json'
 configFileRemoteUrlKey = "eat.configFileRemoteUrl"
@@ -47,21 +50,30 @@ async def get_full_id(object_n):
 
 
 async def eat_it(context, uid, base, mask, photo, number, layer=0):
+    global prop
+    isSwap = False
+    isRandomAngle = False
+    try:
+        isSwap = extensionConfig.get(str(number), {}).get("isSwap", isSwap)
+
+        isRandomAngle = extensionConfig.get(str(number), {}).get("isRandomAngle", isRandomAngle)
+        isRandomAngle = prop.get("isRandomAngle") if prop.get("isRandomAngle") else isRandomAngle
+    except:
+        pass
+
     mask_size = mask.size
     photo_size = photo.size
     if mask_size[0] < photo_size[0] and mask_size[1] < photo_size[1]:
         scale = photo_size[1] / mask_size[1]
         photo = photo.resize((int(photo_size[0] / scale), int(photo_size[1] / scale)), Image.LANCZOS)
     photo = photo.crop((0, 0, mask_size[0], mask_size[1]))
+    # 随机角度旋转头像
+    if isRandomAngle:
+        photo = photo.rotate(randint(1, 359))
     mask1 = Image.new('RGBA', mask_size)
     mask1.paste(photo, mask=mask)
     numberPosition = positions[str(number)]
-    isSwap = False
     # 处理头像，放到和背景同样大小画布的特定位置
-    try:
-        isSwap = extensionConfig[str(number)]["isSwap"]
-    except:
-        pass
     if isSwap:
         photoBg = Image.new('RGBA', base.size)
         photoBg.paste(mask1, (numberPosition[0], numberPosition[1]), mask1)
@@ -84,6 +96,7 @@ async def eat_it(context, uid, base, mask, photo, number, layer=0):
         except:
             await context.edit(f"图片模版加载出错，请检查并更新配置：mask{str(numberPosition[2])}.png")
             return base
+        prop = {}
         base = await eat_it(context, uid, base, maskImg, markImg, numberPosition[2], layer + 1)
 
     temp = base.size[0] if base.size[0] > base.size[1] else base.size[1]
@@ -246,10 +259,11 @@ async def downloadFileByIds(ids, context):
           parameters="<username/uid> [随意内容]")
 async def eat(context: NewMessage.Event):
     assert isinstance(context.message, Message)
+    global prop
     if len(context.parameter) > 2:
         await context.edit("出错了呜呜呜 ~ 无效的参数。")
         return
-    number, diu_round = await getConfigAndDealCommand(context)
+    number, prop = await getConfigAndDealCommand(context)
     if not number:
         return
 
@@ -294,7 +308,7 @@ async def eat(context: NewMessage.Event):
         await context.edit(f"图片模版加载出错，请检查并更新配置：{str(number)}")
         return
 
-    if diu_round:
+    if prop.get("diuRound", False):
         markImg = markImg.rotate(180)  # 对图片进行旋转
     result = await eat_it(context, from_user_id, eatImg, maskImg, markImg, number)
     result.save('plugins/eat/eat.webp')
@@ -359,35 +373,25 @@ async def initConfig(context):
 
 
 async def getConfigAndDealCommand(context):
-    diu_round = False
+    properties = {
+        "diuRound": False,
+        "isRandomAngle": False,
+    }
     number = randint(1, max_number)
     try:
         p1 = 0
         p2 = 0
         if len(context.parameter) >= 1:
             p1 = context.parameter[0]
-            if p1[0] == ".":
-                diu_round = True
-                if len(p1) > 1:
-                    try:
-                        p2 = int("".join(p1[1:]))
-                    except:
-                        # 可能也有字母的参数
-                        p2 = "".join(p1[1:])
-            elif p1[0] == "-":
-                if len(p1) > 1:
-                    try:
-                        p2 = int("".join(p1[1:]))
-                    except:
-                        # 可能也有字母的参数
-                        p2 = "".join(p1[1:])
+            p2 = await parameterPreprocessing(p1, p2, properties)
+            if p1[0] == "-":
                 if p2:
                     redis.set("eat.default-config", p2)
                     await context.edit(f"已经设置默认配置为：{p2}")
                 else:
                     redis.delete("eat.default-config")
                     await context.edit(f"已经清空默认配置")
-                return None, diu_round
+                return None, properties
             elif p1[0] == "/":
                 await context.edit(f"正在更新远程配置文件")
                 # 获取参数中的url
@@ -413,7 +417,7 @@ async def getConfigAndDealCommand(context):
                     configFileRemoteUrl = redis.get(configFileRemoteUrlKey)
                     if not configFileRemoteUrl:
                         await context.edit(f"你没有订阅远程配置文件，更新个🔨")
-                        return None, diu_round
+                        return None, properties
                     configFileRemoteUrl = configFileRemoteUrl.decode().replace(",", "\n")
                     if await updateConfig(context, True) != 0:
                         await context.edit(f"更新配置文件异常，请确认从远程下载的配置文件格式是否正确:\n{configFileRemoteUrl}")
@@ -429,19 +433,19 @@ async def getConfigAndDealCommand(context):
                         configFileRemoteUrl = redis.get(configFileRemoteUrlKey)
                         if not configFileRemoteUrl:
                             await context.edit(f"你没有订阅远程配置文件，更新个🔨")
-                            return None, diu_round
+                            return None, properties
                         configFileRemoteUrl = configFileRemoteUrl.decode().replace(",", "\n")
                         if await updateConfig(context, False) != 0:
                             await context.edit(f"更新配置文件异常，请确认从远程下载的配置文件格式是否正确:\n{configFileRemoteUrl}")
                         else:
                             await downloadFileByIds(ids, context)
-                return None, diu_round
+                return None, properties
             elif p1[0] == "！" or p1[0] == "!":
                 # 加载配置
                 if exists(configFilePath) and len(positions) == 6:
                     if await loadConfigFile(context) != 0:
                         await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
-                        return None, diu_round
+                        return None, properties
                 txt = ""
                 if len(positions) > 0:
                     noShowList = []
@@ -460,24 +464,24 @@ async def getConfigAndDealCommand(context):
                     for key in noShowList:
                         txt = txt.replace(f"\n{key}", "")
                 await context.edit(f"目前已有的模版列表如下：{txt}")
-                return None, diu_round
+                return None, properties
         defaultConfig = redis.get("eat.default-config")
-        if defaultConfig:
-            try:
-                defaultConfig = defaultConfig.decode()
-                defaultConfig = int(defaultConfig)
-            except:
-                defaultConfig = str(defaultConfig)
         if isinstance(p2, str):
             number = p2
         elif isinstance(p2, int) and p2 > 0:
             number = int(p2)
-        elif not diu_round and ((isinstance(p1, int) and int(p1) > 0) or isinstance(p1, str)):
+        elif not properties.get("diuRound") and ((isinstance(p1, int) and int(p1) > 0) or isinstance(p1, str)):
             try:
                 number = int(p1)
             except:
                 number = p1
         elif defaultConfig:
+            try:
+                defaultConfig = defaultConfig.decode()
+                defaultConfig = await parameterPreprocessing(defaultConfig, defaultConfig, properties)
+                defaultConfig = int(defaultConfig)
+            except:
+                defaultConfig = str(defaultConfig)
             number = defaultConfig
         if str(number).isnumeric() and (max_number < number or number < 0):
             # 如果同时指定了id和模版
@@ -485,18 +489,36 @@ async def getConfigAndDealCommand(context):
                 number = context.parameter[1]
             else:
                 number = defaultConfig
-        if str(number).startswith("."):
-            diu_round = True
-            number = number[1:]
     except Exception as e:
         number = randint(1, max_number)
         await log(f'解析异常：{e}')
+        raise e
     try:
         number = str(number)
     except:
         pass
 
-    return number, diu_round
+    return number, properties
+
+
+async def parameterPreprocessing(p1, p2, properties):
+    if len(p1) > 1:
+        hasAdjust = False
+        if p1[0] in ".。":
+            properties["diuRound"] = True
+            hasAdjust = True
+        elif p1[0] in ",，":
+            properties["isRandomAngle"] = True
+            hasAdjust = True
+        elif p1[0] == "-":
+            hasAdjust = True
+        if hasAdjust:
+            try:
+                p2 = int("".join(p1[1:]))
+            except:
+                # 可能也有字母的参数
+                p2 = "".join(p1[1:])
+    return p2
 
 
 async def getTargetUserId(context, from_user):
