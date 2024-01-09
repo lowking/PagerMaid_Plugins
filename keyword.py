@@ -1010,6 +1010,10 @@ async def setdata(context):
         return
 
 
+plain_dict_golbal = get_redis(f"keyword.global.plain")
+regex_dict_golbal = get_redis(f"keyword.global.regex")
+
+
 @listener(incoming=True, outgoing=True, ignore_edited=True)
 async def auto_reply(context):
     global read_context
@@ -1036,7 +1040,7 @@ async def auto_reply(context):
         # 获取当前会话的2种回复配置
         plain_dict = get_redis(f"keyword.{chat_id}.plain")
         regex_dict = get_redis(f"keyword.{chat_id}.regex")
-        if len(plain_dict) == 0 and len(regex_dict) == 0:
+        if len(plain_dict_golbal) == 0 and len(regex_dict_golbal) == 0 and len(plain_dict) == 0 and len(regex_dict) == 0:
             return
         # 获取全局和当前会话设置的mode
         g_mode = g_settings.get("mode", None)
@@ -1069,7 +1073,7 @@ async def auto_reply(context):
         # 是否自我触发
         self_sent = (self_id == sender_id)
         # 处理文本配置
-        for k, v in plain_dict.items():
+        for k, v in {**plain_dict, **plain_dict_golbal}.items():
             # 接收到的文本符合配置
             if k in send_text:
                 # 获取要回复的内容配置
@@ -1083,7 +1087,7 @@ async def auto_reply(context):
                     # 发送回复
                     await send_reply(chat_id, k, "plain", parse_multi(v), context)
         # 处理正则配置
-        for k, v in regex_dict.items():
+        for k, v in {**regex_dict, **regex_dict_golbal}.items():
             pattern = re.compile(k)
             if pattern.search(send_text):
                 tmp = get_redis(f"keyword.{chat_id}.single.regex.{encode(k)}")
