@@ -4,9 +4,12 @@ from os.path import exists
 from os import makedirs, remove
 from PIL import Image, ImageFont, ImageDraw
 from requests import get
+from telethon.errors import YouBlockedUserError, ForbiddenError, FloodWaitError, AuthKeyError
+from telethon.tl.functions.contacts import UnblockRequest
 from telethon.tl.functions.users import GetFullUserRequest
-from telethon.tl.types import MessageMediaPhoto, MessageMediaWebPage
-from pagermaid import bot
+from telethon.tl.types import MessageMediaPhoto, MessageMediaWebPage, MessageMediaUnsupported
+from asyncio import TimeoutError
+from pagermaid import bot, version
 from pagermaid.listener import listener
 from pagermaid.utils import alias_command
 
@@ -110,8 +113,44 @@ async def yv_lu_process_sticker(name, photo, sticker, path):
 
 
 @listener(is_plugin=True, outgoing=True, command=alias_command("yvlu"),
-          description="将回复的消息转换成语录")
+          description="将回复的消息或者输入的字符串转换成语录")
 async def yv_lu(context):
+    reply = await context.get_reply_message()
+    if not reply:
+        message = context.arguments
+        if message:
+            await context.edit(message)
+            reply = context
+        else:
+            return await context.edit('你需要回复一条消息或者输入一串字符。')
+    async with bot.conversation('PagerMaid_QuotLy_bot') as conversation:
+        try:
+            send_for = await reply.forward_to(conversation.chat_id)
+        except YouBlockedUserError:
+            if await context.client(UnblockRequest(id=conversation.chat_id)):
+                send_for = await reply.forward_to(conversation.chat_id)
+            else:
+                return await context.edit("请先解封 @PagerMaid_QuotLy_bot ")
+        except ForbiddenError:
+            return await context.edit("无权限转发消息。")
+        except FloodWaitError:
+            return await context.edit("触发转发 limit 限制")
+        except AuthKeyError:
+            return await context.edit("无权限转发消息。")
+        except:
+            return await context.edit("未知错误。")
+        try:
+            chat_response = await conversation.get_response(message=send_for.id)
+        except TimeoutError:
+            return await context.edit("未收到服务器回应。")
+        await bot.send_read_acknowledge(conversation.chat_id)
+    await bot.send_message(context.chat_id, chat_response, reply_to=context.message.reply_to_msg_id)
+    await context.delete()
+
+
+@listener(is_plugin=True, outgoing=True, command=alias_command("yvlu_"),
+          description="将回复的消息转换成语录")
+async def yv_lu_(context):
     if not context.reply_to_msg_id:
         await context.edit('你需要回复一条消息。')
         return
@@ -121,20 +160,20 @@ async def yv_lu(context):
     # 下载资源文件
     for num in range(1, 5):
         if not exists('plugins/yvlu/p' + str(num) + '.png'):
-            re = get('https://raw.githubusercontent.com/Xtao-Labs/PagerMaid_Plugins/master/yvlu/p' + str(num) + '.png')
+            re = get('https://gitlab.com/Xtao-Labs/PagerMaid_Plugins/-/raw/master/yvlu/p' + str(num) + '.png')
             with open('plugins/yvlu/p' + str(num) + '.png', 'wb') as bg:
                 bg.write(re.content)
     if not exists('plugins/yvlu/mask.png'):
-        re = get('https://raw.githubusercontent.com/Xtao-Labs/PagerMaid_Plugins/master/yvlu/mask.png')
+        re = get('https://gitlab.com/Xtao-Labs/PagerMaid_Plugins/-/raw/master/yvlu/mask.png')
         with open('plugins/yvlu/mask.png', 'wb') as bg:
             bg.write(re.content)
     if not exists('plugins/yvlu/mask1.png'):
-        re = get('https://raw.githubusercontent.com/Xtao-Labs/PagerMaid_Plugins/master/yvlu/mask1.png')
+        re = get('https://gitlab.com/Xtao-Labs/PagerMaid_Plugins/-/raw/master/yvlu/mask1.png')
         with open('plugins/yvlu/mask1.png', 'wb') as bg:
             bg.write(re.content)
     if not exists('plugins/yvlu/ZhuZiAWan-2.ttc'):
         await context.edit('下载字体中。。。')
-        re = get('https://raw.githubusercontent.com/Xtao-Labs/Telegram_PaimonBot/master/assets/fonts/ZhuZiAWan-2.ttc')
+        re = get('https://gitlab.com/Xtao-Labs/Telegram_PaimonBot/-/raw/master/assets/fonts/ZhuZiAWan-2.ttc')
         with open('plugins/yvlu/ZhuZiAWan-2.ttc', 'wb') as bg:
             bg.write(re.content)
     # 获取回复信息
@@ -160,8 +199,9 @@ async def yv_lu(context):
             file_name = 'plugins/yvlu/sticker.jpg'
             await bot.download_media(reply_message.photo, file_name)
         elif isinstance(reply_message.media, MessageMediaWebPage):
-            await context.edit('不支持的文件类型。')
-            return
+            return await context.edit('不支持的文件类型。')
+        elif isinstance(reply_message.media, MessageMediaUnsupported):
+            return await context.edit('不支持的文件类型。')
         elif "image" in reply_message.media.document.mime_type.split('/'):
             file_name = 'plugins/yvlu/sticker.jpg'
             await bot.download_file(reply_message.media.document, file_name)

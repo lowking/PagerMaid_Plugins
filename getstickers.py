@@ -7,15 +7,10 @@ from telethon.tl.functions.messages import GetAllStickersRequest
 from telethon.tl.functions.messages import GetStickerSetRequest
 from telethon.errors import MessageNotModifiedError
 from telethon.errors.rpcerrorlist import StickersetInvalidError
-from pagermaid import working_dir
+from pagermaid import working_dir, version
 from telethon.tl.types import (
-    DocumentAttributeFilename,
     DocumentAttributeSticker,
-    InputMediaUploadedDocument,
-    InputPeerNotifySettings,
     InputStickerSetID,
-    InputStickerSetShortName,
-    MessageMediaPhoto
 )
 from pagermaid.listener import listener
 from pagermaid.utils import alias_command
@@ -29,7 +24,9 @@ except ImportError:
 
 
 @listener(is_plugin=True, outgoing=True, command=alias_command("getstickers"),
-          description="获取整个贴纸包的贴纸，false 关闭 tgs 转 gif；任意值开启下载所有贴纸包；转 gif 需要手动安装 pypi 依赖 lottie[gif] 。",
+          description="获取整个贴纸包的贴纸，false 关闭 tgs 转 gif；任意值开启下载所有贴纸包；\n"
+                      "转 gif 需要手动安装 pypi 依赖 lottie[gif] \n"
+                      "Ubuntu 转换出错请先运行 `-sh apt install libpangocairo-1.0-0 -y`。",
           parameters="<任意值>")
 async def getstickers(context):
     tgs_gif = True

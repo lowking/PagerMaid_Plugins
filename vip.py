@@ -3,7 +3,8 @@ from redis.exceptions import ConnectionError
 from requests import get
 from os import remove
 from telethon.tl.types import MessageMediaPhoto
-from pagermaid import bot, redis, redis_status
+from asyncio import TimeoutError
+from pagermaid import bot, redis, redis_status, version
 from pagermaid.listener import listener
 from pagermaid.utils import obtain_message, alias_command
 
@@ -18,7 +19,7 @@ p_headers = {
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 '
         'Safari/537.36',
 }
-p_original = ['i.pixiv.cat', 'i.pximg.net', 'pixiv.kadokawa.moe']
+p_original = ['i.pixiv.cat', 'i.pximg.net']
 
 
 @listener(is_plugin=True, outgoing=True, command=alias_command("duckduckgo"),
@@ -55,6 +56,41 @@ async def baidu(context):
         await bot.send_read_acknowledge(conversation.chat_id)
         baidu_text = chat_response.text
     await context.edit(baidu_text)
+
+
+@listener(is_plugin=True, outgoing=True, command=alias_command("caiyun"),
+          description="彩云翻译",
+          parameters="<query>")
+async def caiyun_translate(context):
+    await context.edit("获取中 . . .")
+    try:
+        message = await obtain_message(context)
+    except ValueError:
+        return await context.edit("出错了呜呜呜 ~ 无效的参数。")
+    async with bot.conversation('PagerMaid_Modify_bot') as conversation:
+        await conversation.send_message('/translate ' + message)
+        chat_response = await conversation.get_response()
+        await bot.send_read_acknowledge(conversation.chat_id)
+        caiyun_text = chat_response.text
+    await context.edit(caiyun_text)
+
+
+@listener(is_plugin=True, outgoing=True, command=alias_command("deepl"),
+          description="Deepl 翻译",
+          parameters="<query>")
+async def deepl_translate(context):
+    await context.edit("获取中 . . .")
+    try:
+        message = await obtain_message(context)
+    except ValueError:
+        await context.edit("出错了呜呜呜 ~ 无效的参数。")
+        return
+    async with bot.conversation('PagerMaid_Modify_bot') as conversation:
+        await conversation.send_message('/deepl ' + message)
+        chat_response = await conversation.get_response()
+        await bot.send_read_acknowledge(conversation.chat_id)
+        deepl_text = chat_response.text
+    await context.edit(deepl_text)
 
 
 @listener(is_plugin=True, outgoing=True, command=alias_command("weather"),
@@ -136,7 +172,7 @@ async def pixiv(context):
                 except ValueError:
                     await context.edit('镜像源序号错误。')
                     return
-                if 0 < num < 4:
+                if 0 < num < 3:
                     try:
                         redis.set("pixiv_num", num)
                     except ConnectionError:
@@ -150,14 +186,14 @@ async def pixiv(context):
         else:
             pass
     if not redis_status():
-        num = 3
+        num = 2
     else:
         try:
             num = int(redis.get("pixiv_num").decode())
         except AttributeError:
-            num = 3
+            num = 2
         except ConnectionError:
-            num = 3
+            num = 2
     try:
         message = await obtain_message(context)
     except ValueError:
@@ -266,4 +302,61 @@ async def whatanime(context):
                                        video,
                                        caption=text,
                                        reply_to=msg.id)
+    await context.delete()
+
+
+@listener(is_plugin=True, outgoing=True, command=alias_command("tts_nan"),
+          description="通过 Azure 文本到语音 基于字符串生成 简体男声 语音消息。",
+          parameters="<字符串>")
+async def az_tts_nan(context):
+    await az_tts(context, "")
+
+
+@listener(is_plugin=True, outgoing=True, command=alias_command("tts_nv"),
+          description="通过 Azure 文本到语音 基于字符串生成 简体女声 语音消息。",
+          parameters="<字符串>")
+async def az_tts_nv(context):
+    await az_tts(context, "nv")
+
+
+@listener(is_plugin=True, outgoing=True, command=alias_command("tts_tw"),
+          description="通过 Azure 文本到语音 基于字符串生成 繁体男声 语音消息。",
+          parameters="<字符串>")
+async def az_tts_tw(context):
+    await az_tts(context, "tw")
+
+
+@listener(is_plugin=True, outgoing=True, command=alias_command("tts_ne"),
+          description="通过 Azure 文本到语音 基于字符串生成 简体新闻男声 语音消息。",
+          parameters="<字符串>")
+async def az_tts_ne(context):
+    await az_tts(context, "ne")
+
+
+@listener(is_plugin=True, outgoing=True, command=alias_command("tts_en"),
+          description="通过 Azure 文本到语音 基于字符串生成 英文男声 语音消息。",
+          parameters="<字符串>")
+async def az_tts_en(context):
+    await az_tts(context, "en")
+
+
+async def az_tts(context, mode):
+    await context.edit("获取中 . . .")
+    reply = await context.get_reply_message()
+    try:
+        message = await obtain_message(context)
+    except ValueError:
+        await context.edit("出错了呜呜呜 ~ 无效的参数。")
+        return
+    async with bot.conversation('PagerMaid_Modify_bot') as conversation:
+        await conversation.send_message('/tts ' + message + mode)
+        try:
+            chat_response = await conversation.get_response()
+        except TimeoutError:
+            return await context.edit("未收到服务器回应。")
+        await bot.send_read_acknowledge(conversation.chat_id)
+    if reply:
+        await context.respond(chat_response, reply_to=reply)
+    else:
+        await context.respond(chat_response)
     await context.delete()

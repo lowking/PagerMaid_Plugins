@@ -9,6 +9,7 @@ from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.types import MessageEntityMentionName
 from telethon.errors.rpcerrorlist import ChatSendStickersForbiddenError
 from struct import error as StructError
+from pagermaid import version
 from pagermaid.listener import listener
 from pagermaid.utils import alias_command
 
@@ -92,15 +93,15 @@ async def throwit(context):
     reply_to = context.message.reply_to_msg_id
     if exists("plugins/throwit/" + str(target_user.user.id) + ".jpg"):
         if not exists('plugins/throwit/1.png'):
-            r = get('https://raw.githubusercontent.com/xtaodada/PagerMaid_Plugins/master/throwit/1.png')
+            r = get('https://gitlab.com/Xtao-Labs/PagerMaid_Plugins/-/raw/master/throwit/1.png')
             with open("plugins/throwit/1.png", "wb") as code:
                 code.write(r.content)
         if not exists('plugins/throwit/2.png'):
-            r = get('https://raw.githubusercontent.com/xtaodada/PagerMaid_Plugins/master/throwit/2.png')
+            r = get('https://gitlab.com/Xtao-Labs/PagerMaid_Plugins/-/raw/master/throwit/2.png')
             with open("plugins/throwit/2.png", "wb") as code:
                 code.write(r.content)
         if not exists('plugins/throwit/3.png'):
-            r = get('https://raw.githubusercontent.com/xtaodada/PagerMaid_Plugins/master/throwit/3.png')
+            r = get('https://gitlab.com/Xtao-Labs/PagerMaid_Plugins/-/raw/master/throwit/3.png')
             with open("plugins/throwit/3.png", "wb") as code:
                 code.write(r.content)
         # 随机数生成
