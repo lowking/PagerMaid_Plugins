@@ -1036,6 +1036,8 @@ async def auto_reply(context):
         # 获取当前会话的2种回复配置
         plain_dict = get_redis(f"keyword.{chat_id}.plain")
         regex_dict = get_redis(f"keyword.{chat_id}.regex")
+        if len(plain_dict) == 0 and len(regex_dict) == 0:
+            return
         # 获取全局和当前会话设置的mode
         g_mode = g_settings.get("mode", None)
         n_mode = n_settings.get("mode", None)
