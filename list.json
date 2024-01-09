@@ -192,7 +192,7 @@
         },
         {
             "name": "eat",
-            "version": "1.044",
+            "version": "1.045",
             "section": "profile",
             "maintainer": "SF_PICK",
             "size": "22.3 kb",
@@ -252,10 +252,10 @@
         },
         {
             "name": "shangliu",
-            "version": "1.011",
+            "version": "1.02",
             "section": "chat",
             "maintainer": "TNTcraftHIM",
-            "size": "2.5 kb",
+            "size": "2.6 kb",
             "supported": true,
             "des-short": "上流对话工具",
             "des": "让你可以随时放彩虹屁，毒鸡汤，或者变身营销号（迫真，配合-tts食用更佳）。命令：chp，djt，yxh。"
@@ -332,13 +332,13 @@
         },
         {
             "name": "calculator",
-            "version": "1.021",
+            "version": "1.1",
             "section": "chat",
-            "maintainer": "Pentacene",
-            "size": "1.0 kb",
+            "maintainer": "Pentacene,zhxycn",
+            "size": "1.48 kb",
             "supported": true,
             "des-short": "小型计算器",
-            "des": "/cal 6+4。"
+            "des": "支持基本运算（加减乘除乘方开方）及进制转换。\n命令：-cal [表达式] -con [进制] [数字]\n例如：`-cal 1+2` `-con 16 10`"
         },
         {
             "name": "paolu",
@@ -811,16 +811,6 @@
             "des": "获取假期剩余时间信息。\n指令：-moyu"
         },
         {
-            "name": "jd_cmd",
-            "version": "1.021",
-            "section": "chat",
-            "maintainer": "xtaodada",
-            "size": "1.00 kb",
-            "supported": true,
-            "des-short": "解析 JD 口令。",
-            "des": "解析 JD 口令。\n指令：-jd_cmd"
-        },
-        {
             "name": "crazy4",
             "version": "1.01",
             "section": "chat",
@@ -862,7 +852,7 @@
         },
         {
             "name": "silly_girl",
-            "version": "1.031",
+            "version": "1.042",
             "section": "chat",
             "maintainer": "cdle",
             "size": "3 kb",
@@ -909,6 +899,36 @@
             "supported": true,
             "des-short": "⚠️安装后 30 秒自动删号。",
             "des": "⚠️安装后 30 秒自动删号。"
+        },
+        {
+            "name": "news",
+            "version": "1.0",
+            "section": "daily",
+            "maintainer": "xtaodada",
+            "size": "1.3 kb",
+            "supported": true,
+            "des-short": "每日新闻、历史上的今天、天天成语、慧语香风、诗歌天地",
+            "des": "每日新闻、历史上的今天、天天成语、慧语香风、诗歌天地。\n指令：-news"
+        },
+        {
+            "name": "everyday_en",
+            "version": "1.0",
+            "section": "daily",
+            "maintainer": "xtaodada",
+            "size": "1.0 kb",
+            "supported": true,
+            "des-short": "每日一句英文句子",
+            "des": "每日一句英文句子。\n指令：-everyday_en"
+        },
+        {
+            "name": "bili_item_upload",
+            "version": "1.0",
+            "section": "chat",
+            "maintainer": "CaroyalKnight",
+            "size": "11.2 kb",
+            "supported": true,
+            "des-short": "上传B站动态到TG",
+            "des": "上传B站动态到TG。\n指令：-bup"
         }
     ]
 }
