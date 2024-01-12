@@ -50,6 +50,7 @@ sfd time 60，设置检查过期间隔时间为60秒，默认为60秒
 sfd exp 60，设置过期时间为60秒，默认为1800秒（30分钟）
 sfd <on/off> [chatId]，设置当前会话开启/关闭自毁，或者指定id，默认所有会话自动开启
 sfd pin，回复一条自己发的消息，该消息将不会被删除
+sfd <!/！>，查看禁用自毁会话列表
 """,
           parameters="")
 async def selfDestruct(context):
@@ -134,6 +135,9 @@ async def selfDestruct(context):
             msg = redis.zpopmin(messageRedisKey, 1)
         await context.edit("历史消息已全部清除")
         await delayDelete(context)
+    elif p[0] == "!" or p[0] == "！":
+        ids = "\n".join(ignoreChat.split(","))
+        await context.edit(f'📄当前禁用自毁会话：\n{ids}')
 
 
 async def delayDelete(context):
