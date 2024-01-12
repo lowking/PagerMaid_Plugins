@@ -140,7 +140,7 @@ async def selfDestruct(context):
         content = ""
         for cid in ids:
             if cid:
-                content = f'{content}\n`{cid.strip("")}`'
+                content = f'{content}\n`{cid.strip("")}` https://t.me/c/{cid[4:]}'
         await context.edit(f'📄当前禁用自毁会话：\n{content}')
 
 
