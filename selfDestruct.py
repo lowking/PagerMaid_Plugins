@@ -10,6 +10,7 @@ if not redis_status():
     raise Exception("redis未连接无法使用selfDestruct")
 
 ignoreChatKey = "selfDestruct:ignoreChat"
+allowPrivateChatKey = "selfDestruct:allowPrivateChat"
 sleepTimeRedisKey = "selfDestruct:sleepTime"
 messageRedisKey = "selfDestruct:messageList"
 messageExpiredRedisKey = "selfDestruct:expiredTime"
@@ -18,18 +19,24 @@ expiredTime = 1800 if not redisExpiredTime else int(redisExpiredTime.decode())
 redisSleepTime = redis.get(sleepTimeRedisKey)
 sleepTime = 60 if not redisSleepTime else int(redisSleepTime.decode())
 ignoreChat = ""
+allowPrivateChat = ""
 
 
-def loadIgnoreChat():
-    global ignoreChat
+def loadChatConfig():
+    global ignoreChat, allowPrivateChat
     ignoreChat = redis.get(ignoreChatKey)
+    allowPrivateChat = redis.get(allowPrivateChatKey)
     if not ignoreChat:
         ignoreChat = ""
     else:
         ignoreChat = ignoreChat.decode()
+    if not allowPrivateChat:
+        allowPrivateChat = ""
+    else:
+        allowPrivateChat = allowPrivateChat.decode()
 
 
-loadIgnoreChat()
+loadChatConfig()
 
 
 async def getChatId(context):
@@ -48,7 +55,7 @@ async def getChatId(context):
 说明：
 sfd time 60，设置检查过期间隔时间为60秒，默认为60秒
 sfd exp 60，设置过期时间为60秒，默认为1800秒（30分钟）
-sfd <on/off> [chatId]，设置当前会话开启/关闭自毁，或者指定id，默认所有会话自动开启
+sfd <on/off> [chatId]，设置当前会话开启/关闭自毁，或者指定id，默认所有非私聊会话自动开启，私聊自动关闭
 sfd pin，回复一条自己发的消息，该消息将不会被删除
 sfd <!/！>，查看禁用自毁会话列表
 """,
@@ -57,10 +64,19 @@ async def selfDestruct(context):
     global sleepTime, expiredTime, ignoreChat
     p = context.parameter
     if len(p) < 1:
-        if f',{context.chat_id},' in f'{ignoreChat},':
-            status = "未开启"
+        chatId = context.chat_id
+        if f'{chatId}'.startswith("-100"):
+            # 非私聊
+            if f',{chatId},' in f'{ignoreChat},':
+                status = "未开启"
+            else:
+                status = "已开启"
         else:
-            status = "已开启"
+            # 私聊
+            if f',{chatId},' not in f'{allowPrivateChat},':
+                status = "未开启"
+            else:
+                status = "已开启"
         await context.edit(f"⚙️当前设置\n检测间隔时间：{sleepTime}秒\n消息过期时间：{expiredTime}秒\n{status}")
         return
     if p[0] == "time":
@@ -91,26 +107,48 @@ async def selfDestruct(context):
             return
     elif p[0] == "on":
         chatId = await getChatId(context)
-        if f',{chatId},' not in f'{ignoreChat},':
-            await context.edit("已在当前会话开启自毁")
-            await delayDelete(context)
-            return
-        finalIgnoreChat = ignoreChat.replace(f',{chatId}', '')
-        if finalIgnoreChat:
-            redis.set(ignoreChatKey, finalIgnoreChat)
+        if f'{chatId}'.startswith("-100"):
+            # 非私聊
+            if f',{chatId},' not in f'{ignoreChat},':
+                await context.edit("已在当前会话开启自毁")
+                await delayDelete(context)
+                return
+            finalIgnoreChat = ignoreChat.replace(f',{chatId}', '')
+            if finalIgnoreChat:
+                redis.set(ignoreChatKey, finalIgnoreChat)
+            else:
+                redis.delete(ignoreChatKey)
         else:
-            redis.delete(ignoreChatKey)
-        loadIgnoreChat()
+            # 私聊
+            if f',{chatId},' in f'{allowPrivateChat},':
+                await context.edit("已在当前会话开启自毁")
+                await delayDelete(context)
+                return
+            redis.set(allowPrivateChatKey, f'{allowPrivateChat},{chatId}')
+        loadChatConfig()
         await context.edit("开启自毁成功")
         await delayDelete(context)
     elif p[0] == "off":
         chatId = await getChatId(context)
-        if f',{chatId},' in f'{ignoreChat},':
-            await context.edit("当前会话未开启自毁，无需关闭")
-            await delayDelete(context)
-            return
-        redis.set(ignoreChatKey, f'{ignoreChat},{chatId}')
-        loadIgnoreChat()
+        if f'{chatId}'.startswith("-100"):
+            # 非私聊
+            if f',{chatId},' in f'{ignoreChat},':
+                await context.edit("当前会话未开启自毁，无需关闭")
+                await delayDelete(context)
+                return
+            redis.set(ignoreChatKey, f'{ignoreChat},{chatId}')
+        else:
+            # 私聊
+            if f',{chatId},' not in f'{allowPrivateChat},':
+                await context.edit("当前会话未开启自毁，无需关闭")
+                await delayDelete(context)
+                return
+            finalAllowChat = allowPrivateChat.replace(f',{chatId}', '')
+            if finalAllowChat:
+                redis.set(allowPrivateChatKey, finalAllowChat)
+            else:
+                redis.delete(allowPrivateChatKey)
+        loadChatConfig()
         await context.edit("关闭自毁成功")
         await delayDelete(context)
     elif p[0] == "pin":
@@ -141,7 +179,13 @@ async def selfDestruct(context):
         for cid in ids:
             if cid:
                 content = f'{content}\n`{cid.strip("")}` https://t.me/c/{cid[4:]}'
-        await context.edit(f'📄当前禁用自毁会话：\n{content}')
+        content = f'📄当前禁用非私聊自毁会话：{content}\n\n📄当前启用私聊自毁会话：'
+
+        ids = allowPrivateChat.split(",")
+        for cid in ids:
+            if cid:
+                content = f'{content}\n`{cid.strip("")}` tg://user?id={cid}'
+        await context.edit(content)
 
 
 async def delayDelete(context):
@@ -153,7 +197,10 @@ async def delayDelete(context):
 async def dealWithMessage(context):
     chatId = context.chat_id
     msgId = context.message.id
-    if f',{chatId},' not in f'{ignoreChat},':
+    isAllowPublicChat = f',{chatId},' not in f'{ignoreChat},'
+    isAllowPrivateChat = f',{chatId},' in f'{allowPrivateChat},'
+    isAllow = isAllowPublicChat if f'{chatId}'.startswith("-100") else isAllowPrivateChat
+    if isAllow:
         redis.zadd(messageRedisKey, {f"{chatId},{msgId},{context.text}": int(time.time())})
 
 
