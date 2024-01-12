@@ -136,8 +136,12 @@ async def selfDestruct(context):
         await context.edit("历史消息已全部清除")
         await delayDelete(context)
     elif p[0] == "!" or p[0] == "！":
-        ids = "\n".join(ignoreChat.split(","))
-        await context.edit(f'📄当前禁用自毁会话：\n{ids}')
+        ids = ignoreChat.split(",")
+        content = ""
+        for cid in ids:
+            if cid:
+                content = f'{content}\n`{cid.strip("")}`'
+        await context.edit(f'📄当前禁用自毁会话：\n{content}')
 
 
 async def delayDelete(context):
