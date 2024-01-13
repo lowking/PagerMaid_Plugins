@@ -74,7 +74,10 @@ async def selfDestruct(context):
     global sleepTime, expiredTime, ignoreChat
     p = context.parameter
     if len(p) == 0 or (len(p) == 1 and p[0][0] in "-1234567890"):
-        chatId = context.chat_id
+        if len(p) == 1:
+            chatId = p[0]
+        else:
+            chatId = context.chat_id
         if f'{chatId}'.startswith("-100"):
             # 非私聊
             if f',{chatId},' in f'{ignoreChat},':
@@ -88,7 +91,7 @@ async def selfDestruct(context):
             else:
                 status = "已开启"
         expiredTime4Chat = await getExpiredTime4ChatId(chatId)
-        await context.edit(f"⚙️当前设置\n检测间隔时间：{sleepTime}秒\n消息过期时间：{expiredTime4Chat}秒\n{status}")
+        await context.edit(f"⚙️`{chatId}`当前设置\n检测间隔时间：{sleepTime}秒\n消息过期时间：{expiredTime4Chat}秒\n{status}")
         return
     if p[0] == "time":
         if len(p) != 2:
@@ -106,7 +109,7 @@ async def selfDestruct(context):
     elif p[0] == "exp":
         chatId = ""
         try:
-            expiredTime = int(p[1])
+            expiredTime4Chat = int(p[1])
         except:
             await context.edit("设置过期时间参数错误，请输入数字")
             return
@@ -117,11 +120,12 @@ async def selfDestruct(context):
                 await context.edit("指定chatId格式错误，请输入数字")
                 return
         if chatId:
-            redis.set(f'{messageExpiredRedisKey}{chatId}', expiredTime)
-            await context.edit(f"设置 `{chatId[1:]}` 过期时间为{expiredTime}秒")
+            redis.set(f'{messageExpiredRedisKey}{chatId}', expiredTime4Chat)
+            await context.edit(f"设置 `{chatId[1:]}` 过期时间为{expiredTime4Chat}秒")
         else:
-            redis.set(messageExpiredRedisKey, expiredTime)
-            await context.edit(f"设置全局过期时间为{expiredTime}秒")
+            redis.set(messageExpiredRedisKey, expiredTime4Chat)
+            expiredTime = expiredTime4Chat
+            await context.edit(f"设置全局过期时间为{expiredTime4Chat}秒")
         return
     elif p[0] == "on":
         chatId = await getChatId(context)
