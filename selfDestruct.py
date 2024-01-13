@@ -47,6 +47,15 @@ async def getChatId(context):
     return chatId
 
 
+async def getExpiredTime4ChatId(chatId):
+    expiredTime4Chat = redis.get(f'{messageExpiredRedisKey}:{chatId}')
+    try:
+        expiredTime4Chat = int(expiredTime4Chat.decode()) if expiredTime4Chat else expiredTime
+    except:
+        expiredTime4Chat = expiredTime
+    return expiredTime4Chat
+
+
 @listener(is_plugin=True, outgoing=True, command=alias_command("sfd"),
           diagnostics=True,
           description="""
@@ -54,7 +63,7 @@ async def getChatId(context):
 
 说明：
 sfd time 60，设置检查过期间隔时间为60秒，默认为60秒
-sfd exp 60，设置过期时间为60秒，默认为1800秒（30分钟）
+sfd exp 60 [chatId]，设置过期时间为60秒（后面可选指定id），默认为1800秒（30分钟）
 sfd <on/off> [chatId]，设置当前会话开启/关闭自毁，或者指定id，默认所有非私聊会话自动开启，私聊自动关闭
 sfd pin，回复一条自己发的消息，该消息将不会被删除
 sfd <!/！>，查看禁用自毁会话列表
@@ -63,7 +72,7 @@ sfd <!/！>，查看禁用自毁会话列表
 async def selfDestruct(context):
     global sleepTime, expiredTime, ignoreChat
     p = context.parameter
-    if len(p) < 1:
+    if len(p) == 0 or (len(p) == 1 and p[0][0] in "-1234567890"):
         chatId = context.chat_id
         if f'{chatId}'.startswith("-100"):
             # 非私聊
@@ -77,7 +86,8 @@ async def selfDestruct(context):
                 status = "未开启"
             else:
                 status = "已开启"
-        await context.edit(f"⚙️当前设置\n检测间隔时间：{sleepTime}秒\n消息过期时间：{expiredTime}秒\n{status}")
+        expiredTime4Chat = await getExpiredTime4ChatId(chatId)
+        await context.edit(f"⚙️当前设置\n检测间隔时间：{sleepTime}秒\n消息过期时间：{expiredTime4Chat}秒\n{status}")
         return
     if p[0] == "time":
         if len(p) != 2:
@@ -93,18 +103,25 @@ async def selfDestruct(context):
             await context.edit(f"设置时间间隔为{sleepTime}秒")
             return
     elif p[0] == "exp":
-        if len(p) != 2:
+        chatId = ""
+        try:
+            expiredTime = int(p[1])
+        except:
             await context.edit("设置过期时间参数错误，请输入数字")
             return
-        else:
+        if len(p) >= 3:
             try:
-                expiredTime = int(p[1])
+                chatId = f':{int(p[2])}'
             except:
-                await context.edit("设置过期时间参数错误，请输入数字")
+                await context.edit("指定chatId格式错误，请输入数字")
                 return
+        if chatId:
+            redis.set(f'{messageExpiredRedisKey}{chatId}', expiredTime)
+            await context.edit(f"设置 `{chatId[1:]}` 过期时间为{expiredTime}秒")
+        else:
             redis.set(messageExpiredRedisKey, expiredTime)
-            await context.edit(f"设置过期时间为{expiredTime}秒")
-            return
+            await context.edit(f"设置全局过期时间为{expiredTime}秒")
+        return
     elif p[0] == "on":
         chatId = await getChatId(context)
         if f'{chatId}'.startswith("-100"):
@@ -201,7 +218,8 @@ async def dealWithMessage(context):
     isAllowPrivateChat = f',{chatId},' in f'{allowPrivateChat},'
     isAllow = isAllowPublicChat if f'{chatId}'.startswith("-100") else isAllowPrivateChat
     if isAllow:
-        redis.zadd(messageRedisKey, {f"{chatId},{msgId},{context.text}": int(time.time())})
+        expiredTime4Chat = await getExpiredTime4ChatId(chatId)
+        redis.zadd(messageRedisKey, {f"{chatId},{msgId},{context.text}": int(time.time()) + expiredTime4Chat})
 
 
 async def checkMessage():
@@ -212,13 +230,14 @@ async def checkMessage():
             score = int(msg[1])
             msg = msg[0].decode().split(",")
             try:
-                if int(time.time()) - score >= expiredTime:
+                if int(time.time()) - score >= 0:
                     await bot.delete_messages(entity=int(msg[0]), message_ids=[int(msg[1])])
                     redis.zpopmin(messageRedisKey, 1)
                     continue
             except Exception as e:
                 if str(e).startswith("Cannot find any entity corresponding to"):
                     continue
+                await log(f'请联系作者添加未处理异常：{str(e)}')
         await sleep(sleepTime)
 
 
