@@ -62,6 +62,7 @@ async def getExpiredTime4ChatId(chatId):
 将消息id存入redis有序队列按发送时间排序，之后每隔一段时间获取队列中要到期的消息然后删除。
 
 说明：
+sfd [chatId]，查看当前会话设置或者指定chatId
 sfd time 60，设置检查过期间隔时间为60秒，默认为60秒
 sfd exp 60 [chatId]，设置过期时间为60秒（后面可选指定id），默认为1800秒（30分钟）
 sfd <on/off> [chatId]，设置当前会话开启/关闭自毁，或者指定id，默认所有非私聊会话自动开启，私聊自动关闭
