@@ -68,6 +68,7 @@ sfd exp 60 [chatId]，设置过期时间为60秒（后面可选指定id），默
 sfd <on/off> [chatId]，设置当前会话开启/关闭自毁，或者指定id，默认所有非私聊会话自动开启，私聊自动关闭
 sfd pin，回复一条自己发的消息，该消息将不会被删除
 sfd <!/！>，查看禁用自毁会话列表
+sfd his <chatId>，删除指定会话所有历史消息
 """,
           parameters="")
 async def selfDestruct(context):
@@ -208,6 +209,35 @@ async def selfDestruct(context):
             if cid:
                 content = f'{content}\n`{cid.strip("")}` tg://user?id={cid}'
         await context.edit(content)
+    elif p[0] == "his":
+        try:
+            chatId = int(p[1])
+        except:
+            await context.edit("请输入正确的chatId")
+            await delayDelete(context)
+            return
+        await clearHistory(context, chatId)
+
+
+async def clearHistory(context, chatId):
+    count = 0
+    total = 0
+    await context.edit("正在统计消息数量。。。")
+    async for _ in context.client.iter_messages(chatId, from_user="me"):
+        total += 1
+    if total:
+        step = total / 10
+        await context.edit(f'共找到{total}条消息，开始删除。。。')
+        async for message in context.client.iter_messages(chatId, from_user="me", reverse=True):
+            await message.delete()
+            count += 1
+            if count % step == 1:
+                await context.edit(f'删除中，进度{count}/{total}')
+        await context.edit(f'成功删除`{chatId}`会话{count}条消息')
+        await sleep(1)
+    else:
+        await context.edit("没有找到消息")
+    await delayDelete(context)
 
 
 async def delayDelete(context):
