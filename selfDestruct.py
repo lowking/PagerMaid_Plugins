@@ -243,6 +243,7 @@ async def checkMessage():
                 if str(e).startswith("Cannot find any entity corresponding to"):
                     continue
                 await log(f'请联系作者添加未处理异常：{str(e)}')
+                redis.zpopmin(messageRedisKey, 1)
         await sleep(sleepTime)
 
 
