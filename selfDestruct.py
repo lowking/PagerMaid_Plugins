@@ -223,15 +223,20 @@ async def selfDestruct(context):
 
 
 async def clearHistory(context, chatId, isPrintMsg):
-    count = 0
-    total = 0
     await context.edit("正在统计消息数量。。。")
-    async for _ in context.client.iter_messages(chatId, from_user="me"):
-        total += 1
-    if total:
+    msgs = []
+    try:
+        async for msg in context.client.iter_messages(chatId, from_user="me", reverse=True):
+            msgs.append(msg)
+    except:
+        await context.edit("无法找到该会话，请确认是否已退出或者不存在。")
+        await delayDelete(context)
+    if msgs:
+        count = 0
+        total = len(msgs)
         step = total / 10
         await context.edit(f'共找到{total}条消息，开始删除。。。')
-        async for message in context.client.iter_messages(chatId, from_user="me", reverse=True):
+        for message in msgs:
             if isPrintMsg:
                 text = message.text if message.text else "空文本消息"
                 cid = f'{chatId}'[4:] if f'{chatId}'.startswith("-100") else chatId
