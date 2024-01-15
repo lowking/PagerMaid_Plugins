@@ -213,13 +213,16 @@ async def selfDestruct(context):
         try:
             chatId = int(p[1])
         except:
-            await context.edit("请输入正确的chatId")
-            await delayDelete(context)
-            return
-        await clearHistory(context, chatId)
+            try:
+                chatId = int(p[1][:-1])
+            except:
+                await context.edit("请输入正确的chatId")
+                await delayDelete(context)
+                return
+        await clearHistory(context, chatId, p[1][-1:] in "!！")
 
 
-async def clearHistory(context, chatId):
+async def clearHistory(context, chatId, isPrintMsg):
     count = 0
     total = 0
     await context.edit("正在统计消息数量。。。")
@@ -229,6 +232,10 @@ async def clearHistory(context, chatId):
         step = total / 10
         await context.edit(f'共找到{total}条消息，开始删除。。。')
         async for message in context.client.iter_messages(chatId, from_user="me", reverse=True):
+            if isPrintMsg:
+                text = message.text if message.text else "空文本消息"
+                cid = f'{chatId}'[4:] if f'{chatId}'.startswith("-100") else chatId
+                await bot.send_message(context.chat_id, f'[{text}](https://t.me/c/{cid}/{message.id})')
             await message.delete()
             count += 1
             if count % step == 1:
