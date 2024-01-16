@@ -210,16 +210,21 @@ async def selfDestruct(context):
                 content = f'{content}\n`{cid.strip("")}` tg://user?id={cid}'
         await context.edit(content)
     elif p[0] == "his":
-        try:
-            chatId = int(p[1])
-        except:
+        if len(p) == 1:
+            chatId = context.chat_id
+            isPrintMsg = False
+        else:
             try:
-                chatId = int(p[1][:-1])
+                chatId = int(p[1])
             except:
-                await context.edit("请输入正确的chatId")
-                await delayDelete(context)
-                return
-        await clearHistory(context, chatId, p[1][-1:] in "!！")
+                try:
+                    chatId = int(p[1][:-1])
+                except:
+                    await context.edit("请输入正确的chatId")
+                    await delayDelete(context)
+                    return
+            isPrintMsg = p[1][-1:] in "!！"
+        await clearHistory(context, chatId, isPrintMsg)
 
 
 async def clearHistory(context, chatId, isPrintMsg):
