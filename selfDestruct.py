@@ -69,10 +69,11 @@ sfd <on/off> [chatId]，设置当前会话开启/关闭自毁，或者指定id�
 sfd pin，回复一条自己发的消息，该消息将不会被删除
 sfd <!/！>，查看禁用自毁会话列表
 sfd his <chatId>，删除指定会话所有历史消息
+sfd reset，重置所有配置
 """,
           parameters="")
 async def selfDestruct(context):
-    global sleepTime, expiredTime, ignoreChat
+    global sleepTime, expiredTime, ignoreChat, allowPrivateChat
     p = context.parameter
     if len(p) == 0 or (len(p) == 1 and p[0][0] in "-1234567890"):
         if len(p) == 1:
@@ -225,6 +226,16 @@ async def selfDestruct(context):
                     return
             isPrintMsg = p[1][-1:] in "!！"
         await clearHistory(context, chatId, isPrintMsg)
+    elif p[0] == "reset":
+        ignoreChat = ""
+        allowPrivateChat = ""
+        expiredTime = 1800
+        sleepTime = 60
+        keys = redis.keys("selfDestruct:*")
+        for key in keys:
+            redis.delete(key)
+        await context.edit("重置所有配置完成")
+        await delayDelete(context)
 
 
 async def clearHistory(context, chatId, isPrintMsg):
