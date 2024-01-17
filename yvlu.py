@@ -123,14 +123,14 @@ async def yv_lu(context):
             reply = context
         else:
             return await context.edit('你需要回复一条消息或者输入一串字符。')
-    async with bot.conversation('PagerMaid_QuotLy_bot') as conversation:
+    async with bot.conversation('@QuotLyBot') as conversation:
         try:
             send_for = await reply.forward_to(conversation.chat_id)
         except YouBlockedUserError:
             if await context.client(UnblockRequest(id=conversation.chat_id)):
                 send_for = await reply.forward_to(conversation.chat_id)
             else:
-                return await context.edit("请先解封 @PagerMaid_QuotLy_bot ")
+                return await context.edit("请先解封 @QuotLyBot ")
         except ForbiddenError:
             return await context.edit("无权限转发消息。")
         except FloodWaitError:
