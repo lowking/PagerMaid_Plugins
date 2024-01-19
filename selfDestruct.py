@@ -2,9 +2,12 @@ import time
 import traceback
 
 from asyncio import sleep
+from collections import defaultdict
+
 from pagermaid import redis, redis_status, version, log, bot
 from pagermaid.listener import listener
 from pagermaid.utils import alias_command, pip_install
+from telethon import functions, types
 
 if not redis_status():
     raise Exception("redis未连接无法使用selfDestruct")
@@ -20,9 +23,15 @@ redisSleepTime = redis.get(sleepTimeRedisKey)
 sleepTime = 60 if not redisSleepTime else int(redisSleepTime.decode())
 ignoreChat = ""
 allowPrivateChat = ""
+traceKeywordsDict = defaultdict()
+
+traceRedisKey = "trace"
+globalMatchRedisKey = f'{traceRedisKey}:globalMatch'
+globalMatch = redis.get(globalMatchRedisKey)
+globalMatch = True if globalMatch else False
 
 
-def loadChatConfig():
+def loadSfdChatConfig():
     global ignoreChat, allowPrivateChat
     ignoreChat = redis.get(ignoreChatKey)
     allowPrivateChat = redis.get(allowPrivateChatKey)
@@ -36,7 +45,16 @@ def loadChatConfig():
         allowPrivateChat = allowPrivateChat.decode()
 
 
-loadChatConfig()
+def loadTraceChatConfig():
+    global traceKeywordsDict
+    traceKeywordsDict = defaultdict(list)
+    keys = redis.keys(f'{traceRedisKey}:*')
+    for key in keys:
+        traceKeywordsDict[key.decode()] = redis.get(key).decode()
+
+
+loadSfdChatConfig()
+loadTraceChatConfig()
 
 
 async def getChatId(context):
@@ -70,10 +88,13 @@ sfd pin，回复一条自己发的消息，该消息将不会被删除
 sfd <!/！>，查看禁用自毁会话列表
 sfd his <chatId>，删除指定会话所有历史消息
 sfd reset，重置所有配置
+
+sfd trace <emoji> [keyword]，设置自动点赞，如果回复一条消息发送emoji，则对那个人自动点赞；如果发送一个关键字，则根据关键字进行自动点赞，根据是否回复他人决定是否是全局关键字（如果有回复则设置回复消息所在聊天的关键字，否则就是全局关键字）；要删除用-号：-[keyword]
+sfd trace gm <true/false>，开关全局匹配，效果就是同一条消息触发多个点赞
 """,
           parameters="")
 async def selfDestruct(context):
-    global sleepTime, expiredTime, ignoreChat, allowPrivateChat
+    global sleepTime, expiredTime, ignoreChat, allowPrivateChat, globalMatch
     p = context.parameter
     if len(p) == 0 or (len(p) == 1 and p[0][0] in "-1234567890"):
         if len(p) == 1:
@@ -149,7 +170,7 @@ async def selfDestruct(context):
                 await delayDelete(context)
                 return
             redis.set(allowPrivateChatKey, f'{allowPrivateChat},{chatId}')
-        loadChatConfig()
+        loadSfdChatConfig()
         await context.edit("开启自毁成功")
         await delayDelete(context)
     elif p[0] == "off":
@@ -172,7 +193,7 @@ async def selfDestruct(context):
                 redis.set(allowPrivateChatKey, finalAllowChat)
             else:
                 redis.delete(allowPrivateChatKey)
-        loadChatConfig()
+        loadSfdChatConfig()
         await context.edit("关闭自毁成功")
         await delayDelete(context)
     elif p[0] == "pin":
@@ -236,6 +257,177 @@ async def selfDestruct(context):
             redis.delete(key)
         await context.edit("重置所有配置完成")
         await delayDelete(context)
+    elif p[0] == "trace":
+        reply = await context.get_reply_message()
+        chatId = context.chat_id
+        try:
+            emoji = p[1]
+            isDelete = emoji[0] == "-"
+        except:
+            emoji = ""
+            isDelete = False
+        # 处理列出所有配置
+        if emoji:
+            if emoji in "!！":
+                await printConfig4Trace(context)
+                return
+            elif emoji == "gm":
+                try:
+                    if p[2] == "true":
+                        globalMatch = True
+                        redis.set(globalMatchRedisKey, "true")
+                        msg = "已开启全局匹配"
+                    else:
+                        globalMatch = False
+                        redis.delete(globalMatchRedisKey)
+                        msg = "已关闭全局匹配"
+                    await context.edit(msg)
+                except:
+                    await context.edit("请正确输入指令：sfd trace gm <true/false>，开关全局匹配")
+                await delayDelete(context)
+                return
+        if isDelete:
+            emoji = emoji[1:]
+        if len(p) == 3:
+            # 处理有关键词的情况
+            kw = p[2]
+            # 根据是否回复消息，确定是否全局关键字
+            if reply:
+                key = f'{traceRedisKey}:keywords:{chatId}'
+            else:
+                key = f'{traceRedisKey}:keywords'
+            globalStr = "当前会话" if reply else "全局"
+            kws = redis.get(key)
+            kws = kws.decode().split(";") if kws else []
+            if isDelete:
+                # 遍历配置，找到对应emoji的配置，删除对应关键字
+                kws = dealWithKeyword(emoji, kw, kws, isDelete)
+                if kws:
+                    redis.set(key, kws)
+                    traceKeywordsDict[key] = kws
+                else:
+                    redis.delete(key)
+                    del traceKeywordsDict[key]
+                await context.edit(f'已删除{globalStr}关键字：{kw}')
+            else:
+                # 遍历配置，找到对应emoji配置，追加
+                kws = dealWithKeyword(emoji, kw, kws, isDelete)
+                # 尝试点赞，如果emoji不合法则不添加
+                try:
+                    await sendReaction(context.client, chatId, context.message.id, emoji)
+                    redis.set(key, kws)
+                    traceKeywordsDict[key] = kws
+                    await context.edit(f'已添加{globalStr}关键字：{kw}，自动用{emoji}点赞')
+                except Exception as e:
+                    if str(e).startswith("Invalid reaction"):
+                        await context.edit("设置自动点赞失败，请配置合法emoji")
+                        await delayDelete(context)
+                        return
+                    raise e
+            await delayDelete(context)
+            return
+        elif len(p) == 2:
+            # 处理只传emoji的情况
+            if reply:
+                key = f'{traceRedisKey}:{chatId}:{reply.sender_id}'
+                redis.set(key, emoji)
+                traceKeywordsDict[key] = emoji
+                try:
+                    await sendReaction(context.client, chatId, reply.id, emoji)
+                    await context.edit(f'已对他开启自动点赞：{emoji}')
+                except Exception as e:
+                    redis.delete(key)
+                    del traceKeywordsDict[key]
+                    if str(e).startswith("Invalid reaction"):
+                        await context.edit("设置自动点赞失败，请配置合法emoji")
+                        await delayDelete(context)
+                        return
+                    raise e
+            else:
+                await context.edit("请回复一条消息")
+            await delayDelete(context)
+            return
+        # 以上都不是，判断是否回复人，回复了就取消对他自动点赞
+        if reply:
+            key = f'{traceRedisKey}:{chatId}:{reply.sender_id}'
+            if redis.get(key):
+                redis.delete(key)
+                del traceKeywordsDict[key]
+                await context.edit("已取消对他自动点赞")
+            else:
+                await context.edit("未对他自动点赞无需删除")
+            await delayDelete(context)
+            return
+        await context.edit("请认真阅读help说明，输入正确指令")
+        await delayDelete(context)
+        return
+
+
+def convert2Str(configs):
+    if not configs:
+        return ""
+    msg = ""
+    for config in configs.split(";"):
+        conf = config.split(":")
+        msg = f'{msg}{conf[0]}: {", ".join(conf[1].split(",,"))[2:]}\n'
+    return msg
+
+
+async def printConfig4Trace(context):
+    globalKeywords = ""
+    chatKeywords = ""
+    keywords = ""
+    for key in traceKeywordsDict:
+        if not key:
+            return
+        ks = key.split(":")
+        if len(ks) == 2:
+            # trace:keywords
+            if ks[1] != "keywords":
+                continue
+            globalKeywords = f'{globalKeywords}{convert2Str(traceKeywordsDict[key])}'
+        elif ks[1] == "keywords":
+            # trace:keywords:-1001589058412
+            chatKeywords = f'{chatKeywords}{ks[2]}:\n{convert2Str(traceKeywordsDict[key])}'
+        else:
+            # trace:-1001589058412:12341512
+            keywords = f'{keywords}{ks[1]}([TA](tg://user?id={ks[2]})):{traceKeywordsDict[key]}\n'
+    await context.edit(f'全局关键字配置：\n{globalKeywords}\n会话关键字配置：\n{chatKeywords}\n针对个人配置：\n{keywords}')
+    await sleep(20)
+    await delayDelete(context)
+
+
+def dealWithKeyword(emoji, kw, kws, isDelete):
+    if not isDelete and not kws:
+        return f'{emoji}:,,{kw}'
+    removeIds = []
+    isFound = False
+    for i in range(len(kws)):
+        k = kws[i]
+        split = k.split(":")
+        e = split[0]
+        if e != emoji:
+            continue
+        isFound = True
+        if isDelete:
+            if f',,{kw},,' in f'{split[1]},,':
+                keys = split[1].split(",,")
+                keys.remove(kw)
+                split[1] = f'{",,".join(keys)}'
+                if not split[1].strip():
+                    removeIds.append(i)
+        else:
+            if f',,{kw},,' not in f'{split[1]},,':
+                split[1] = f'{split[1]},,{kw}'
+        kws[i] = ":".join(split)
+        break
+    if not isFound:
+        kws.append(f'{emoji}:,,{kw}')
+    if removeIds:
+        for i in removeIds:
+            del kws[i]
+    kws = ";".join(kws)
+    return kws
 
 
 async def clearHistory(context, chatId, isPrintMsg):
@@ -274,7 +466,7 @@ async def delayDelete(context):
 
 
 @listener(incoming=False, outgoing=True, ignore_edited=True)
-async def dealWithMessage(context):
+async def dealWithMessage4Sfd(context):
     chatId = context.chat_id
     msgId = context.message.id
     isAllowPublicChat = f',{chatId},' not in f'{ignoreChat},'
@@ -283,6 +475,71 @@ async def dealWithMessage(context):
     if isAllow:
         expiredTime4Chat = await getExpiredTime4ChatId(chatId)
         redis.zadd(messageRedisKey, {f"{chatId},{msgId},{context.text}": int(time.time()) + expiredTime4Chat})
+
+
+@listener(incoming=True, outgoing=False, ignore_edited=True)
+async def traceMessage(context):
+    chatId = context.chat_id
+    senderId = context.sender_id
+    # 获取当前会话关键字配置
+    kws = traceKeywordsDict.get(f'{traceRedisKey}:keywords:{chatId}')
+    isReturn = await dealWithKeywords4Trace(context, kws)
+    if not globalMatch and isReturn:
+        return
+    # 获取全局关键字配置
+    globalKws = traceKeywordsDict.get(f'{traceRedisKey}:keywords')
+    isReturn = await dealWithKeywords4Trace(context, globalKws)
+    if not globalMatch and isReturn:
+        return
+    # 获取当前会话发送者的配置
+    emoticon = traceKeywordsDict.get(f'{traceRedisKey}:{chatId}:{senderId}')
+    if not emoticon:
+        return
+    try:
+        await sendReaction(context.client, chatId, context.message.id, emoticon)
+    except Exception as e:
+        await log(f'exception: {e}')
+
+
+async def dealWithKeywords4Trace(context, keywords):
+    if not keywords:
+        return False
+    reactions = []
+    for kws in keywords.split(";"):
+        kw = kws.split(":")
+        ks = kw[1].split(",,")
+        for k in ks:
+            if k.strip() and k in context.message.text:
+                try:
+                    if globalMatch:
+                        reactions.append(types.ReactionEmoji(emoticon=kw[0]))
+                    else:
+                        await sendReaction(context.client, context.chat_id, context.message.id, [types.ReactionEmoji(emoticon=kw[0])])
+                except Exception as e:
+                    if str(e).startswith("The specified message ID is invalid or you can't do that operation on such message"):
+                        if not globalMatch:
+                            return True
+                    await log(f'exception: {e}')
+                if not globalMatch:
+                    return True
+    if globalMatch and len(reactions) > 0:
+        await sendReaction(context.client, context.chat_id, context.message.id, reactions)
+    return False
+
+
+async def sendReaction(client, chatId, messageId, emoticon):
+    try:
+        await client(
+            functions.messages.SendReactionRequest(
+                peer=chatId,
+                msg_id=messageId,
+                big=True,
+                add_to_recent=True,
+                reaction=emoticon
+            )
+        )
+    except Exception as e:
+        raise e
 
 
 async def checkMessage():
