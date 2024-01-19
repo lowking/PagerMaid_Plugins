@@ -86,15 +86,16 @@ sfd exp 60 [chatId]，设置过期时间为60秒（后面可选指定id），默
 sfd <on/off> [chatId]，设置当前会话开启/关闭自毁，或者指定id，默认所有非私聊会话自动开启，私聊自动关闭
 sfd pin，回复一条自己发的消息，该消息将不会被删除
 sfd <!/！>，查看禁用自毁会话列表
-sfd his <chatId>，删除指定会话所有历史消息
+sfd his [chatId]，删除指定会话所有历史消息或当前会话
 sfd reset，重置所有配置
 
 sfd trace <emoji> [keyword]，设置自动点赞，如果回复一条消息发送emoji，则对那个人自动点赞；如果发送一个关键字，则根据关键字进行自动点赞，根据是否回复他人决定是否是全局关键字（如果有回复则设置回复消息所在聊天的关键字，否则就是全局关键字）；要删除用-号：-[keyword]
 sfd trace gm <true/false>，开关全局匹配，效果就是同一条消息触发多个点赞
+sfd trace reset，重置自动点赞所有配置
 """,
           parameters="")
 async def selfDestruct(context):
-    global sleepTime, expiredTime, ignoreChat, allowPrivateChat, globalMatch
+    global sleepTime, expiredTime, ignoreChat, allowPrivateChat, globalMatch, traceKeywordsDict
     p = context.parameter
     if len(p) == 0 or (len(p) == 1 and p[0][0] in "-1234567890"):
         if len(p) == 1:
@@ -286,6 +287,15 @@ async def selfDestruct(context):
                     await context.edit("请正确输入指令：sfd trace gm <true/false>，开关全局匹配")
                 await delayDelete(context)
                 return
+            elif emoji == "reset":
+                traceKeywordsDict = defaultdict()
+                globalMatch = False
+                keys = redis.keys(f'{traceRedisKey}:*')
+                for key in keys:
+                    redis.delete(key)
+                await context.edit("重置所有配置完成")
+                await delayDelete(context)
+
         if isDelete:
             emoji = emoji[1:]
         if len(p) == 3:
@@ -314,7 +324,7 @@ async def selfDestruct(context):
                 kws = dealWithKeyword(emoji, kw, kws, isDelete)
                 # 尝试点赞，如果emoji不合法则不添加
                 try:
-                    await sendReaction(context.client, chatId, context.message.id, emoji)
+                    await sendReaction(context.client, chatId, context.message.id, [types.ReactionEmoji(emoticon=emoji)])
                     redis.set(key, kws)
                     traceKeywordsDict[key] = kws
                     await context.edit(f'已添加{globalStr}关键字：{kw}，自动用{emoji}点赞')
@@ -333,7 +343,7 @@ async def selfDestruct(context):
                 redis.set(key, emoji)
                 traceKeywordsDict[key] = emoji
                 try:
-                    await sendReaction(context.client, chatId, reply.id, emoji)
+                    await sendReaction(context.client, chatId, reply.id, [types.ReactionEmoji(emoticon=emoji)])
                     await context.edit(f'已对他开启自动点赞：{emoji}')
                 except Exception as e:
                     redis.delete(key)
@@ -496,7 +506,7 @@ async def traceMessage(context):
     if not emoticon:
         return
     try:
-        await sendReaction(context.client, chatId, context.message.id, emoticon)
+        await sendReaction(context.client, chatId, context.message.id, [types.ReactionEmoji(emoticon=emoticon)])
     except Exception as e:
         await log(f'exception: {e}')
 
