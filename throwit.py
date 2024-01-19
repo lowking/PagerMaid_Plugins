@@ -86,12 +86,12 @@ async def throwit(context):
                 return
             raise exception
     photo = await context.client.download_profile_photo(
-        target_user.user.id,
-        "plugins/throwit/" + str(target_user.user.id) + ".jpg",
+        target_user.full_user.id,
+        "plugins/throwit/" + str(target_user.full_user.id) + ".jpg",
         download_big=True
     )
     reply_to = context.message.reply_to_msg_id
-    if exists("plugins/throwit/" + str(target_user.user.id) + ".jpg"):
+    if exists("plugins/throwit/" + str(target_user.full_user.id) + ".jpg"):
         if not exists('plugins/throwit/1.png'):
             r = get('https://gitlab.com/Xtao-Labs/PagerMaid_Plugins/-/raw/master/throwit/1.png')
             with open("plugins/throwit/1.png", "wb") as code:
@@ -107,7 +107,7 @@ async def throwit(context):
         # 随机数生成
         randint_r = randint(1, 3)
         # 将头像转为圆形
-        markImg = Image.open("plugins/throwit/" + str(target_user.user.id) + ".jpg")
+        markImg = Image.open("plugins/throwit/" + str(target_user.full_user.id) + ".jpg")
         if randint_r == 1:
             thumb_width = 136
         elif randint_r == 2:
@@ -116,7 +116,7 @@ async def throwit(context):
             thumb_width = 180
         im_square = crop_max_square(markImg).resize((thumb_width, thumb_width), Image.LANCZOS)
         im_thumb = mask_circle_transparent(im_square, 0)
-        im_thumb.save("plugins/throwit/" + str(target_user.user.id) + ".png")
+        im_thumb.save("plugins/throwit/" + str(target_user.full_user.id) + ".png")
         # 将头像复制到模板上
         if randint_r == 1:
             background = Image.open("plugins/throwit/2.png")
@@ -124,7 +124,7 @@ async def throwit(context):
             background = Image.open("plugins/throwit/1.png")
         elif randint_r == 3:
             background = Image.open("plugins/throwit/3.png")
-        foreground = Image.open("plugins/throwit/" + str(target_user.user.id) + ".png")
+        foreground = Image.open("plugins/throwit/" + str(target_user.full_user.id) + ".png")
         if len(context.parameter) == 2:
             diu_round = True
         if diu_round:
@@ -138,8 +138,8 @@ async def throwit(context):
         background.save('plugins/throwit/throwout.webp')
         target_file = await context.client.upload_file('plugins/throwit/throwout.webp')
         try:
-            remove("plugins/throwit/" + str(target_user.user.id) + ".jpg")
-            remove("plugins/throwit/" + str(target_user.user.id) + ".png")
+            remove("plugins/throwit/" + str(target_user.full_user.id) + ".jpg")
+            remove("plugins/throwit/" + str(target_user.full_user.id) + ".png")
             remove("plugins/throwit/throwout.webp")
             remove(photo)
         except:

@@ -185,13 +185,13 @@ async def yv_lu_(context):
     target_user = await context.client(GetFullUserRequest(user_id))
     # 下载头像
     await bot.download_profile_photo(
-        target_user.user.id,
-        "plugins/yvlu/" + str(target_user.user.id) + ".jpg",
+        target_user.full_user.id,
+        "plugins/yvlu/" + str(target_user.full_user.id) + ".jpg",
         download_big=True
     )
-    name = target_user.user.first_name
-    if target_user.user.last_name:
-        name += f' {target_user.user.last_name}'
+    name = target_user.full_user.first_name
+    if target_user.full_user.last_name:
+        name += f' {target_user.full_user.last_name}'
     # 判断是否为贴纸
     file_name = None
     if reply_message and reply_message.media:
@@ -208,13 +208,13 @@ async def yv_lu_(context):
         else:
             await context.edit('不支持的文件类型。')
             return
-    if exists("plugins/yvlu/" + str(target_user.user.id) + ".jpg"):
+    if exists("plugins/yvlu/" + str(target_user.full_user.id) + ".jpg"):
         if file_name:
-            await yv_lu_process_sticker(name, f"{target_user.user.id}.jpg", file_name, 'plugins/yvlu/')
+            await yv_lu_process_sticker(name, f"{target_user.full_user.id}.jpg", file_name, 'plugins/yvlu/')
             remove(file_name)
         else:
-            yv_lu_process_image(name, reply_message.message, f"{target_user.user.id}.jpg", 'plugins/yvlu/')
-        remove("plugins/yvlu/" + str(target_user.user.id) + ".jpg")
+            yv_lu_process_image(name, reply_message.message, f"{target_user.full_user.id}.jpg", 'plugins/yvlu/')
+        remove("plugins/yvlu/" + str(target_user.full_user.id) + ".jpg")
     else:
         if file_name:
             await yv_lu_process_sticker(name, None, file_name, 'plugins/yvlu/')
