@@ -46,7 +46,7 @@ configFileRemoteUrlKey = "eat.configFileRemoteUrl"
 async def get_full_id(object_n):
     if isinstance(object_n, Channel):
         return (await bot(GetFullChannelRequest(object_n.id))).full_chat.id  # noqa
-    return (await bot(GetFullUserRequest(object_n.id))).user.id
+    return (await bot(GetFullUserRequest(object_n.id))).full_user.id
 
 
 async def eat_it(context, uid, base, mask, photo, number, layer=0):
@@ -563,17 +563,17 @@ async def getTargetUserAvatar(context, target_user_id):
 async def getTargetUserByContextEntities(context, user, user_object):
     if isinstance(context.message.entities[0], MessageEntityMentionName):
         target_user = await context.client(GetFullUserRequest(context.message.entities[0].user_id))
-        target_user_id = target_user.user.id
+        target_user_id = target_user.full_user.id
     elif isinstance(context.message.entities[0], MessageEntityPhone):
         if user > 0:
             target_user = await context.client(GetFullUserRequest(user))
-            target_user_id = target_user.user.id
+            target_user_id = target_user.full_user.id
         else:
             target_user = await context.client(GetFullChannelRequest(user))
             target_user_id = target_user.full_chat.id
     elif isinstance(context.message.entities[0], MessageEntityBotCommand):
         target_user = await context.client(GetFullUserRequest(user_object.id))
-        target_user_id = target_user.user.id
+        target_user_id = target_user.full_user.id
     else:
         return await context.edit("出错了呜呜呜 ~ 参数错误。")
     return target_user, target_user_id
@@ -587,7 +587,7 @@ async def getTargetUserByContextAndReply(context, reply_message):
         return
     if user_id > 0:
         target_user = await context.client(GetFullUserRequest(user_id))
-        target_user_id = target_user.user.id
+        target_user_id = target_user.full_user.id
     else:
         target_user = await context.client(GetFullChannelRequest(user_id))
         target_user_id = target_user.full_chat.id
