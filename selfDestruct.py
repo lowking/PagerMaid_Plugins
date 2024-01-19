@@ -533,7 +533,14 @@ async def dealWithKeywords4Trace(context, keywords):
                 if not globalMatch:
                     return True
     if globalMatch and len(reactions) > 0:
-        await sendReaction(context.client, context.chat_id, context.message.id, reactions)
+        try:
+            if len(reactions) > 3:
+                reactions = reactions[-3:]
+            await sendReaction(context.client, context.chat_id, context.message.id, reactions)
+        except Exception as e:
+            if str(e).startswith("The specified message ID is invalid or you can't do that operation on such message"):
+                return True
+            await log(f'exception: {e}')
     return False
 
 
