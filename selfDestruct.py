@@ -1,3 +1,4 @@
+import re
 import time
 import traceback
 
@@ -89,7 +90,7 @@ sfd <!/！>，查看禁用自毁会话列表
 sfd his [chatId]，删除指定会话所有历史消息或当前会话
 sfd reset，重置所有配置
 
-sfd trace <emoji> [keyword]，设置自动点赞，如果回复一条消息发送emoji，则对那个人自动点赞；如果发送一个关键字，则根据关键字进行自动点赞，根据是否回复他人决定是否是全局关键字（如果有回复则设置回复消息所在聊天的关键字，否则就是全局关键字）；要删除用-号：-[keyword]
+sfd trace <emoji> [keyword]，设置自动点赞，如果回复一条消息发送emoji，则对那个人自动点赞；如果发送一个关键字，则根据关键字进行自动点赞，根据是否回复他人决定是否是全局关键字（如果有回复则设置回复消息所在聊天的关键字，否则就是全局关键字）；要删除用-号：-[keyword]；支持正则了，只需要keyword传入 reg/正则表达式 即可。
 sfd trace gm <true/false>，开关全局匹配，效果就是同一条消息触发多个点赞
 sfd trace reset，重置自动点赞所有配置
 """,
@@ -301,12 +302,28 @@ async def selfDestruct(context):
         if len(p) == 3:
             # 处理有关键词的情况
             kw = p[2]
+            # 参数校验
+            if ",," in kw:
+                await context.edit("请勿连续使用2个以上,号")
+                await delayDelete(context)
+                return
+            # 判断类型：text，regex
+            isRegex = False
+            if kw.startswith("reg/"):
+                try:
+                    re.compile(kw[4:])
+                    isRegex = True
+                except:
+                    await context.edit("请输入正确的正则表达式！")
+                    await delayDelete(context)
+                    return
             # 根据是否回复消息，确定是否全局关键字
             if reply:
                 key = f'{traceRedisKey}:keywords:{chatId}'
             else:
                 key = f'{traceRedisKey}:keywords'
             globalStr = "当前会话" if reply else "全局"
+            keywordTypeStr = "正则" if isRegex else "关键字"
             kws = redis.get(key)
             kws = kws.decode().split(";") if kws else []
             if isDelete:
@@ -318,7 +335,7 @@ async def selfDestruct(context):
                 else:
                     redis.delete(key)
                     del traceKeywordsDict[key]
-                await context.edit(f'已删除{globalStr}关键字：{kw}')
+                await context.edit(f'已删除{globalStr}{keywordTypeStr}：{kw}')
             else:
                 # 遍历配置，找到对应emoji配置，追加
                 kws = dealWithKeyword(emoji, kw, kws, isDelete)
@@ -327,7 +344,7 @@ async def selfDestruct(context):
                     await sendReaction(context.client, chatId, context.message.id, [types.ReactionEmoji(emoticon=emoji)])
                     redis.set(key, kws)
                     traceKeywordsDict[key] = kws
-                    await context.edit(f'已添加{globalStr}关键字：{kw}，自动用{emoji}点赞')
+                    await context.edit(f'已添加{globalStr}{keywordTypeStr}：{kw}，自动用{emoji}点赞')
                 except Exception as e:
                     if str(e).startswith("Invalid reaction"):
                         await context.edit("设置自动点赞失败，请配置合法emoji")
@@ -379,7 +396,12 @@ def convert2Str(configs):
     msg = ""
     for config in configs.split(";"):
         conf = config.split(":")
-        msg = f'{msg}{conf[0]}: {", ".join(conf[1].split(",,"))[2:]}\n'
+        kws = ""
+        for kw in conf[1].split(",,"):
+            if not kw:
+                continue
+            kws = f'{kws}, `{kw}`'
+        msg = f'{msg}{conf[0]}: {kws[2:]}\n'
     return msg
 
 
@@ -402,7 +424,7 @@ async def printConfig4Trace(context):
         else:
             # trace:-1001589058412:12341512
             keywords = f'{keywords}{ks[1]}([TA](tg://user?id={ks[2]})):{traceKeywordsDict[key]}\n'
-    await context.edit(f'全局关键字配置：\n{globalKeywords}\n会话关键字配置：\n{chatKeywords}\n针对个人配置：\n{keywords}')
+    await context.edit(f'全局关键字/正则配置：\n{globalKeywords}\n会话关键字/正则配置：\n{chatKeywords}\n针对个人配置：\n{keywords}')
     await sleep(20)
     await delayDelete(context)
 
@@ -515,24 +537,27 @@ async def dealWithKeywords4Trace(context, keywords):
     if not keywords:
         return False
     reactions = []
+    text = context.message.text
     for kws in keywords.split(";"):
         kw = kws.split(":")
         ks = kw[1].split(",,")
         for k in ks:
-            if k.strip() and k in context.message.text:
-                try:
-                    if globalMatch:
-                        reactions.append(types.ReactionEmoji(emoticon=kw[0]))
-                    else:
-                        await sendReaction(context.client, context.chat_id, context.message.id, [types.ReactionEmoji(emoticon=kw[0])])
-                except Exception as e:
-                    if str(e).startswith("The specified message ID is invalid or you can't do that operation on such message"):
-                        if not globalMatch:
-                            return True
-                    await log(f'exception: {e}')
-                if not globalMatch:
-                    return True
-    if globalMatch and len(reactions) > 0:
+            k = k.strip()
+            if not k:
+                continue
+            if k.startswith("reg/"):
+                # 正则
+                k = re.compile(k[4:])
+                if k.search(text):
+                    reactions.append(types.ReactionEmoji(emoticon=kw[0]))
+            elif k in text:
+                reactions.append(types.ReactionEmoji(emoticon=kw[0]))
+            if not globalMatch and len(reactions) == 1:
+                break
+        if not globalMatch and len(reactions) == 1:
+            break
+
+    if len(reactions) > 0:
         try:
             if len(reactions) > 3:
                 reactions = reactions[-3:]
@@ -540,7 +565,7 @@ async def dealWithKeywords4Trace(context, keywords):
         except Exception as e:
             if str(e).startswith("The specified message ID is invalid or you can't do that operation on such message"):
                 return True
-            await log(f'exception: {e}')
+            await log(f'exception: {e}\n{reactions}')
     return False
 
 
