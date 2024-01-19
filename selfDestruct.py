@@ -475,6 +475,7 @@ async def clearHistory(context, chatId, isPrintMsg):
         count = 0
         total = len(msgs)
         step = int(total / 10)
+        step = total if step == 0 else step
         await context.edit(f'共找到{total}条消息，开始删除。。。')
         for message in msgs:
             if isPrintMsg:
