@@ -1,13 +1,12 @@
 import re
 import time
-import traceback
 
 from asyncio import sleep
 from collections import defaultdict
 
-from pagermaid import redis, redis_status, version, log, bot
+from pagermaid import redis, redis_status, log, bot
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, pip_install
+from pagermaid.utils import alias_command
 from telethon import functions, types
 
 if not redis_status():
@@ -90,7 +89,9 @@ sfd <!/！>，查看禁用自毁会话列表
 sfd his [chatId]，删除指定会话所有历史消息或当前会话
 sfd reset，重置所有配置
 
-sfd trace <emoji> [keyword]，设置自动点赞，如果回复一条消息发送emoji，则对那个人自动点赞；如果发送一个关键字，则根据关键字进行自动点赞，根据是否回复他人决定是否是全局关键字（如果有回复则设置回复消息所在聊天的关键字，否则就是全局关键字）；要删除用-号：-[keyword]；支持正则了，只需要keyword传入 reg/正则表达式 即可。
+sfd trace <emoji> [keyword]，设置自动点赞，如果回复一条消息发送emoji，则对那个人自动点赞；如果发送一个\
+关键字，则根据关键字进行自动点赞，根据是否回复他人决定是否是全局关键字（如果有回复则设置回复消息所在聊天的关\
+键字，否则就是全局关键字）；要删除用-号：-[keyword]；支持正则了，只需要keyword传入 reg/正则表达式 即可。
 sfd trace gm <true/false>，开关全局匹配，效果就是同一条消息触发多个点赞
 sfd trace reset，重置自动点赞所有配置
 """,
