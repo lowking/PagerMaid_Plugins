@@ -72,7 +72,7 @@
         },
         {
             "name": "throwit",
-            "version": "1.621",
+            "version": "1.622",
             "section": "profile",
             "maintainer": "xtaodada",
             "size": "6.9 kb",
@@ -192,7 +192,7 @@
         },
         {
             "name": "eat",
-            "version": "1.045",
+            "version": "1.046",
             "section": "profile",
             "maintainer": "SF_PICK",
             "size": "22.3 kb",
@@ -372,7 +372,7 @@
         },
         {
             "name": "keyword",
-            "version": "2.703",
+            "version": "2.704",
             "section": "chat",
             "maintainer": "c3b2a,xtaodada",
             "size": "47.6 kb",
@@ -672,7 +672,7 @@
         },
         {
             "name": "groupindex",
-            "version": "1.122",
+            "version": "1.123",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "3.2 kb",
@@ -682,7 +682,7 @@
         },
         {
             "name": "yvlu",
-            "version": "1.22",
+            "version": "1.23",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "10.4 kb",
@@ -832,7 +832,7 @@
         },
         {
             "name": "dc",
-            "version": "1.0",
+            "version": "1.1",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "3.0 kb",
@@ -929,6 +929,16 @@
             "supported": true,
             "des-short": "上传B站动态到TG",
             "des": "上传B站动态到TG。\n指令：-bup"
+        },
+        {
+            "name": "selfDestruct",
+            "version": "1.0",
+            "section": "chat",
+            "maintainer": "lowking",
+            "size": "23 kb",
+            "supported": true,
+            "des-short": "消息自毁",
+            "des": "消息自毁，自动点赞。\n指令：-sfd"
         }
     ]
 }
