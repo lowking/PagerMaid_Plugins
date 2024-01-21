@@ -8,7 +8,7 @@ from random import randint
 from struct import error as StructError
 
 from PIL import Image
-from pagermaid import redis, config, bot, log
+from pagermaid import redis, config, bot, log, redis_status
 from pagermaid.listener import listener
 from pagermaid.utils import alias_command
 from requests import get
@@ -41,6 +41,10 @@ prop = {}
 max_number = len(positions)
 configFilePath = 'plugins/eat/config.json'
 configFileRemoteUrlKey = "eat.configFileRemoteUrl"
+
+defaultConfig = ""
+if redis_status():
+    defaultConfig = redis.get("eat.default-config").decode()
 
 
 async def get_full_id(object_n):
@@ -124,11 +128,11 @@ async def updateConfig(context, forceDownload=False):
         with open(configFilePath, 'w+', encoding="utf-8") as ms:
             for url in urls:
                 try:
-                    re = get(url)
+                    resp = get(url)
                 except:
                     ret = -1
                     break
-                remoteConfigJson = json.loads(re.content)
+                remoteConfigJson = json.loads(resp.content)
                 # 将文件内容转成json，与下载的内容合并
                 localStr = json.dumps(localConfigJson["positions"])
                 remoteStr = json.dumps(remoteConfigJson["positions"])
@@ -150,9 +154,9 @@ async def updateConfig(context, forceDownload=False):
 
 def downloadFileFromUrl(url, filepath):
     try:
-        re = get(url)
+        resp = get(url)
         with open(filepath, 'wb') as ms:
-                ms.write(re.content)
+                ms.write(resp.content)
     except:
         return -1
     return 0
@@ -198,7 +202,8 @@ async def loadConfigFile(context, forceDownload=False):
                         downloadFileFromUrl(fileUrl, filePath)
 
                 except:
-                    await context.edit(f"下载文件异常，url：{fileUrl}")
+                    if context:
+                        await context.edit(f"下载文件异常，url：{fileUrl}")
                     return -1
     except:
         return -1
@@ -267,7 +272,8 @@ async def eat(context: NewMessage.Event):
     if not number:
         return
 
-    if redis.get(configFileRemoteUrlKey) and len(notifyStrArr) <= 6:
+    if len(notifyStrArr) <= 6 and redis.get(configFileRemoteUrlKey):
+        # 未初始化并且订阅了远程配置
         await initConfig(context)
     try:
         notifyStr = notifyStrArr[str(number)]
@@ -277,8 +283,7 @@ async def eat(context: NewMessage.Event):
     from_user = context.sender
     from_user_id = await get_full_id(from_user)
     target_user_id = await getTargetUserId(context, from_user)
-    initConfigResult = await initConfig(context)
-    if not target_user_id or initConfigResult == 0:
+    if not target_user_id:
         return
     photo = await getTargetUserAvatar(context, target_user_id)
     if not photo:
@@ -290,13 +295,13 @@ async def eat(context: NewMessage.Event):
         for num in range(1, max_number + 1):
             print(num)
             if not exists('plugins/eat/eat' + str(num) + '.png'):
-                re = get(f'{git_source}eat/eat' + str(num) + '.png')
+                resp = get(f'{git_source}eat/eat' + str(num) + '.png')
                 with open('plugins/eat/eat' + str(num) + '.png', 'wb') as bg:
-                    bg.write(re.content)
+                    bg.write(resp.content)
             if not exists('plugins/eat/mask' + str(num) + '.png'):
-                re = get(f'{git_source}eat/mask' + str(num) + '.png')
+                resp = get(f'{git_source}eat/mask' + str(num) + '.png')
                 with open('plugins/eat/mask' + str(num) + '.png', 'wb') as ms:
-                    ms.write(re.content)
+                    ms.write(resp.content)
     else:
         await context.edit("此用户未设置头像或头像对您不可见。")
         return
@@ -338,8 +343,6 @@ async def eat(context: NewMessage.Event):
             except:
                 pass
             return
-        except TypeError:
-            await context.edit("此用户未设置头像或头像对您不可见。")
         except ChatSendStickersForbiddenError:
             await context.edit("此群组无法发送贴纸。")
     else:
@@ -357,8 +360,6 @@ async def eat(context: NewMessage.Event):
             except:
                 pass
             return
-        except TypeError:
-            await context.edit("此用户未设置头像或头像对您不可见。")
         except ChatSendStickersForbiddenError:
             await context.edit("此群组无法发送贴纸。")
 
@@ -367,12 +368,14 @@ async def initConfig(context):
     # 加载配置
     if exists(configFilePath):
         if await loadConfigFile(context) != 0:
-            await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
+            if context:
+                await context.edit(f"加载配置文件异常，请确认从远程下载的配置文件格式是否正确")
             return 0
     return 1
 
 
 async def getConfigAndDealCommand(context):
+    global defaultConfig
     properties = {
         "diuRound": False,
         "isRandomAngle": False,
@@ -387,9 +390,11 @@ async def getConfigAndDealCommand(context):
             if p1[0] == "-":
                 if p2:
                     redis.set("eat.default-config", p2)
+                    defaultConfig = p2
                     await context.edit(f"已经设置默认配置为：{p2}")
                 else:
                     redis.delete("eat.default-config")
+                    defaultConfig = ""
                     await context.edit(f"已经清空默认配置")
                 return None, properties
             elif p1[0] == "/":
@@ -465,7 +470,6 @@ async def getConfigAndDealCommand(context):
                         txt = txt.replace(f"\n{key}", "")
                 await context.edit(f"目前已有的模版列表如下：{txt}")
                 return None, properties
-        defaultConfig = redis.get("eat.default-config")
         if isinstance(p2, str):
             number = p2
         elif isinstance(p2, int) and p2 > 0:
@@ -477,7 +481,6 @@ async def getConfigAndDealCommand(context):
                 number = p1
         elif defaultConfig:
             try:
-                defaultConfig = defaultConfig.decode()
                 defaultConfig = await parameterPreprocessing(defaultConfig, defaultConfig, properties)
                 defaultConfig = int(defaultConfig)
             except:
@@ -490,7 +493,6 @@ async def getConfigAndDealCommand(context):
             else:
                 number = defaultConfig
     except Exception as e:
-        number = randint(1, max_number)
         await log(f'解析异常：{e}')
         raise e
     try:
@@ -614,3 +616,6 @@ async def getTargetUserByClientEntity(context, user):
             await context.edit("出错了呜呜呜 ~ 指定的 UserID 已超出长度限制，您确定输对了？")
             return
         raise exception
+
+
+bot.loop.create_task(initConfig(None))
