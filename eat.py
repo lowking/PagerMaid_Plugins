@@ -492,6 +492,11 @@ async def getConfigAndDealCommand(context):
                 number = context.parameter[1]
             else:
                 number = defaultConfig
+            try:
+                number = await parameterPreprocessing(number, number, properties)
+                number = int(number)
+            except:
+                number = str(number)
     except Exception as e:
         await log(f'解析异常：{e}')
         raise e
