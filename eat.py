@@ -293,7 +293,6 @@ async def eat(context: NewMessage.Event):
     reply_to = context.message.reply_to_msg_id
     if exists("plugins/eat/" + str(target_user_id) + ".jpg"):
         for num in range(1, max_number + 1):
-            print(num)
             if not exists('plugins/eat/eat' + str(num) + '.png'):
                 resp = get(f'{git_source}eat/eat' + str(num) + '.png')
                 with open('plugins/eat/eat' + str(num) + '.png', 'wb') as bg:
