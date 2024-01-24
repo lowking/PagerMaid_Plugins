@@ -44,7 +44,8 @@ configFileRemoteUrlKey = "eat.configFileRemoteUrl"
 
 defaultConfig = ""
 if redis_status():
-    defaultConfig = redis.get("eat.default-config").decode()
+    defaultConfig = redis.get("eat.default-config")
+    defaultConfig = redis.get("eat.default-config").decode() if defaultConfig else defaultdict
 
 
 async def get_full_id(object_n):
