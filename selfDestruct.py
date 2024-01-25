@@ -4,7 +4,7 @@ import time
 from asyncio import sleep
 from collections import defaultdict
 
-from pagermaid import redis, redis_status, log, bot
+from pagermaid import redis, redis_status, log, bot, logs
 from pagermaid.listener import listener
 from telethon import functions, types
 
@@ -531,7 +531,7 @@ async def traceMessage(context):
     try:
         await sendReaction(context.client, chatId, context.message.id, [types.ReactionEmoji(emoticon=emoticon)])
     except Exception as e:
-        await log(f'exception: {e}')
+        logs.debug(f'exception: {e}')
 
 
 async def dealWithKeywords4Trace(context, keywords):
@@ -566,7 +566,7 @@ async def dealWithKeywords4Trace(context, keywords):
         except Exception as e:
             if str(e).startswith("The specified message ID is invalid or you can't do that operation on such message"):
                 return True
-            await log(f'exception: {e}\n{reactions}')
+            logs.debug(f'exception: {e}\n{reactions}')
     return False
 
 
