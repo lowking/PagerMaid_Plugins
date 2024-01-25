@@ -8,11 +8,14 @@ from pagermaid import bot
 from telethon.tl.types import MessageMediaPhoto, MessageMediaWebPage
 
 
-def make_reply_msg(context, sourceText):
+def make_reply_msg(context, sourceText, prefix):
     tag = ""
     remark = ""
     # 获取标签
-    msgs = context.text[1:].split("！")
+    if prefix:
+        msgs = context.text[len(prefix):].split("！")
+    else:
+        msgs = context.text[1:].split("！")
     tag = msgs[0]
     if len(msgs) > 1:
         remark = "！".join(msgs[1:])
@@ -30,7 +33,7 @@ def make_reply_msg(context, sourceText):
                 tag = f"{tag} #{t}"
 
     if remark != "":
-        separator = "\n--------------------------\n"
+        separator = "\n\n"
         if sourceText == "":
             separator = ""
         remark = f"{remark}{separator}"
@@ -38,7 +41,7 @@ def make_reply_msg(context, sourceText):
     return f"{tag}\n{remark}{sourceText}"
 
 
-async def main(context, sender_ids, forward_target):
+async def main(context, sender_ids, forward_target, prefix):
     sender_ids = f"{sender_ids}"
     if forward_target is not None:
         # 判断发送者是否有权限
@@ -59,7 +62,7 @@ async def main(context, sender_ids, forward_target):
             # 判断消息类型
             try:
                 isNeedDeal = True
-                resultMsg = make_reply_msg(context, target.text).strip()
+                resultMsg = make_reply_msg(context, target.text, prefix).strip()
                 if target.media is not None and not isinstance(target.media, MessageMediaWebPage):
                     try:
                         mediaType = target.media.document.mime_type.split('/')

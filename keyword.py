@@ -5,7 +5,7 @@ from shutil import copyfile, move, rmtree
 from uuid import uuid4
 from base64 import b64encode, b64decode
 from importlib import import_module
-from pagermaid import bot, redis, log, redis_status, working_dir, version
+from pagermaid import bot, redis, log, redis_status, working_dir, version, logs
 from pagermaid import user_id as me_id
 from pagermaid.listener import listener
 from pagermaid.utils import alias_command
@@ -251,7 +251,8 @@ async def send_reply(chat_id, trigger, mode, reply_msg, context):
                         module = f"import_module('data.keyword_func.{func_name}').main"
                         parameter = f"context{', %s' % func_args if func_args else ''}"
                         func_data = await eval(f"{module}({parameter})")
-                    except:
+                    except Exception as e:
+                        logs.debug(f'exec func error: {e}')
                         func_data = "[RE]"
                     chdir(working_dir)
                     re_msg = re_msg.replace("${func_%s}" % func_exec, str(func_data))
