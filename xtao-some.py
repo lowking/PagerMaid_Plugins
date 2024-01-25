@@ -3,13 +3,13 @@ import json, requests, re
 from urllib.parse import urlparse
 from pagermaid import bot, log, version
 from pagermaid.listener import listener, config
-from pagermaid.utils import clear_emojis, obtain_message, attach_log, alias_command, client
+from pagermaid.utils import clear_emojis, obtain_message, attach_log, client
 from telethon.errors import ChatAdminRequiredError
 from telethon.errors.rpcerrorlist import FloodWaitError, UserAdminInvalidError
 from telethon.tl.types import ChannelParticipantsAdmins, ChannelParticipantsBots, ChannelParticipantAdmin
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("guess"),
+@listener(is_plugin=True, outgoing=True, command="guess",
           description="能不能好好说话？ - 拼音首字母缩写释义工具（需要回复一句话）")
 async def guess(context):
     reply = await context.get_reply_message()
@@ -38,7 +38,7 @@ async def guess(context):
         await context.edit("没有匹配到拼音首字母缩写")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("wiki"),
+@listener(is_plugin=True, outgoing=True, command="wiki",
           description="查询维基百科词条",
           parameters="<词组>")
 async def wiki(context):
@@ -71,7 +71,7 @@ async def wiki(context):
     await context.edit(message)
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("ip"),
+@listener(is_plugin=True, outgoing=True, command="ip",
           description="IPINFO （或者回复一句话）",
           parameters="<ip/域名>")
 async def ipinfo(context):
@@ -164,7 +164,7 @@ async def ipinfo(context):
         await context.edit('没有找到要查询的 ip/域名 ...')
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("ipping"),
+@listener(is_plugin=True, outgoing=True, command="ipping",
           description="Ping （或者回复一句话）",
           parameters="<ip/域名>")
 async def ipping(context):
@@ -209,7 +209,7 @@ async def ipping(context):
         await context.edit('没有找到要查询的 ip/域名 ...')
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("getdel"),
+@listener(is_plugin=True, outgoing=True, command="getdel",
           description="获取当前群组/频道的死号数。")
 async def getdel(context):
     """ PagerMaid getdel. """
@@ -248,7 +248,7 @@ async def getdel(context):
         await context.edit("请在群组/频道发送。")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("get_bots"),
+@listener(is_plugin=True, outgoing=True, command="get_bots",
           description="获取当前群组/频道的Bot列表。")
 async def get_bots(context):
     cid = str(context.chat_id)

@@ -1,8 +1,8 @@
 from pagermaid.listener import listener
-from pagermaid.utils import attach_log, execute, alias_command
+from pagermaid.utils import attach_log, execute
 
 
-@listener(is_plugin=False, outgoing=True, command=alias_command("cal"),
+@listener(is_plugin=False, outgoing=True, command="cal",
           description="计算\n示例：\n`-cal 1+1`加法\n`-cal 2-1`减法\n`-cal 1*2`乘法\n`-cal 4/2`除法\n`-cal 4^2`幂运算\n`-cal sqrt(4)`开方",
           parameters="<基本运算>")
 async def cal(context):
@@ -28,7 +28,7 @@ async def cal(context):
     else:
         return
 
-@listener(is_plugin=False, outgoing=True, command=alias_command("con"),
+@listener(is_plugin=False, outgoing=True, command="con",
             description="换算\n示例：\n`-con 2 99`将99转换为2进制",
             parameters="<进制(数字)> <数值>")
 async def con(context):

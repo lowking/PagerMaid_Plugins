@@ -6,10 +6,10 @@ from PIL import Image, ImageOps
 from math import floor
 from pagermaid import bot, redis, redis_status, version
 from pagermaid.listener import listener
-from pagermaid.utils import lang, alias_command
+from pagermaid.utils import lang
 
 
-@listener(is_plugin=False, outgoing=True, command=alias_command("pic2sticker"),
+@listener(is_plugin=False, outgoing=True, command="pic2sticker",
           description='将图片转换为贴纸',
           parameters="<round>")
 async def pic2sticker(context):

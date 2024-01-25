@@ -6,7 +6,6 @@ from collections import defaultdict
 
 from pagermaid import redis, redis_status, log, bot
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from telethon import functions, types
 
 if not redis_status():
@@ -74,7 +73,7 @@ async def getExpiredTime4ChatId(chatId):
     return expiredTime4Chat
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("sfd"),
+@listener(is_plugin=True, outgoing=True, command="sfd",
           diagnostics=True,
           description="""
 将消息id存入redis有序队列按发送时间排序，之后每隔一段时间获取队列中要到期的消息然后删除。

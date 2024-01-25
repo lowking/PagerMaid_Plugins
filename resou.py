@@ -3,10 +3,9 @@ from requests import get
 from json.decoder import JSONDecodeError
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("zhrs"),
+@listener(is_plugin=True, outgoing=True, command="zhrs",
           description="知乎热搜。")
 async def zhrs(context):
     await context.edit("获取中 . . .")
@@ -25,7 +24,7 @@ async def zhrs(context):
         await context.edit("出错了呜呜呜 ~ 无法访问到 API 服务器 。")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("wbrs"),
+@listener(is_plugin=True, outgoing=True, command="wbrs",
           description="微博热搜。")
 async def wbrs(context):
     await context.edit("获取中 . . .")
@@ -45,7 +44,7 @@ async def wbrs(context):
         await context.edit("出错了呜呜呜 ~ 无法访问到 API 服务器 。")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("dyrs"),
+@listener(is_plugin=True, outgoing=True, command="dyrs",
           description="抖音热搜。")
 async def dyrs(context):
     await context.edit("获取中 . . .")
@@ -64,7 +63,7 @@ async def dyrs(context):
         await context.edit("出错了呜呜呜 ~ 无法访问到 API 服务器 。")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("brank"),
+@listener(is_plugin=True, outgoing=True, command="brank",
           description="B站排行榜。")
 async def brank(context):
     await context.edit("获取中 . . .")

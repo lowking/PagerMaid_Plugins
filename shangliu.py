@@ -2,10 +2,10 @@ from time import sleep
 from requests import get
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, client
+from pagermaid.utils import client
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("chp"),
+@listener(is_plugin=True, outgoing=True, command="chp",
           description="彩虹屁生成器。")
 async def chp(context):
     await context.edit("获取中 . . .")
@@ -25,7 +25,7 @@ async def chp(context):
         await context.delete()
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("djt"),
+@listener(is_plugin=True, outgoing=True, command="djt",
           description="毒鸡汤生成器。")
 async def djt(context):
     await context.edit("获取中 . . .")
@@ -45,7 +45,7 @@ async def djt(context):
         await context.delete()
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("yxh"),
+@listener(is_plugin=True, outgoing=True, command="yxh",
           description="营销号文案生成器（建议配合tts食用）。", parameters="<主体> <事件> <原因>")
 async def yxh(context):
     try:

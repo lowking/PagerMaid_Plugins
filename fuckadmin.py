@@ -1,5 +1,4 @@
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from pagermaid import version
 from telethon.tl.types import ChannelParticipantsAdmins
 
@@ -39,7 +38,7 @@ def mention_user(user):
     return f'`{user.first_name}` [`{mention}`]'
 
 
-@listener(is_plugin=False, outgoing=True, command=alias_command("fuckadmin"),
+@listener(is_plugin=False, outgoing=True, command="fuckadmin",
           description='列出群组中所有潜水超过 n 天的管理员。（n>=7）。',
           parameters="<day>")
 async def fuck_admin(context):

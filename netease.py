@@ -2,10 +2,9 @@ import json
 from requests import get
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("netease"),
+@listener(is_plugin=True, outgoing=True, command="netease",
           description="随机一条网易云音乐评论。")
 async def netease(context):
     await context.edit("获取中 . . .")

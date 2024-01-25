@@ -3,11 +3,11 @@ from telethon.errors import ChatAdminRequiredError
 from telethon.tl.types import Channel, ChatBannedRights
 from telethon.tl.functions.channels import GetFullChannelRequest, EditBannedRequest
 from pagermaid import redis, log, redis_status, bot, user_id, version
-from pagermaid.utils import lang, alias_command
+from pagermaid.utils import lang
 from pagermaid.listener import listener
 
 
-@listener(is_plugin=False, outgoing=True, command=alias_command('antichannelmsg'),
+@listener(is_plugin=False, outgoing=True, command='antichannelmsg',
           description='开启对话的自动删除频道消息并且封禁频道功能，需要 Redis',
           parameters="<true|false|add <cid>|filter <participants_count>|status>")
 async def anti_channel_msg(context):

@@ -9,7 +9,7 @@ from telethon.tl.types import PeerUser
 from telethon.tl.custom import Message
 from pagermaid import redis, redis_status, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, pip_install
+from pagermaid.utils import pip_install
 
 pip_install("dateparser")
 
@@ -58,7 +58,7 @@ async def remove_others_message(context):
                     pass
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("autodel"),
+@listener(is_plugin=True, outgoing=True, command="autodel",
           diagnostics=True,
           description="""
 在指定的时间后删除所回复用户发送的消息。只对当前群组有效。

@@ -5,10 +5,9 @@ from pytz import timezone
 from datetime import datetime
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("epic"),
+@listener(is_plugin=True, outgoing=True, command="epic",
           description="获取 Epic 喜加一信息")
 async def epic(context):
     await context.edit("获取中 . . .")

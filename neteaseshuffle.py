@@ -4,14 +4,14 @@ from time import sleep
 from pagermaid import version
 from pagermaid.listener import listener
 from os import remove, path
-from pagermaid.utils import alias_command, pip_install
+from pagermaid.utils import pip_install
 
 pip_install("eyed3")
 
 import eyed3
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("ns"),
+@listener(is_plugin=True, outgoing=True, command="ns",
           description="随机网抑云热歌。")
 async def ns(context):
     await context.edit("获取中 . . .")

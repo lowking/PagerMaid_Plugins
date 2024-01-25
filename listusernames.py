@@ -1,10 +1,9 @@
 from pagermaid import bot, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from telethon.tl.functions.channels import GetAdminedPublicChannelsRequest
 
 
-@listener(is_plugin=False, outgoing=True, command=alias_command("listusernames"),
+@listener(is_plugin=False, outgoing=True, command="listusernames",
           description='列出所有属于自己的公开群组/频道。',
           parameters="")
 async def listusernames(context):

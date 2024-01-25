@@ -5,11 +5,10 @@ from telethon.tl.types import DocumentAttributeFilename, MessageMediaPhoto, Mess
 from PIL import Image
 from pagermaid import bot, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from random import random
 
 
-@listener(outgoing=True, command=alias_command("stickertopic"),
+@listener(outgoing=True, command="stickertopic",
           description="将你回复的静态贴纸转换为图片", parameters="<y/n>（是否发送原图，默认为n）")
 async def stickertopic(context):
     try:

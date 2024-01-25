@@ -3,11 +3,11 @@ from telethon.errors import ChatAdminRequiredError
 from telethon.tl.types import Channel
 from asyncio import sleep
 from pagermaid import redis, log, redis_status, version
-from pagermaid.utils import lang, alias_command
+from pagermaid.utils import lang
 from pagermaid.listener import listener
 
 
-@listener(is_plugin=False, outgoing=True, command=alias_command('antichannelpin'),
+@listener(is_plugin=False, outgoing=True, command='antichannelpin',
           description='开启对话的自动取消频道置顶功能，需要 Redis',
           parameters="<true|false|status>")
 async def antichannelpin(context):

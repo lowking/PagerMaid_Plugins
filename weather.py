@@ -3,7 +3,7 @@ import datetime
 from requests import get
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import obtain_message, alias_command
+from pagermaid.utils import obtain_message
 
 icons = {
     "01d": "🌞",
@@ -38,7 +38,7 @@ def calcWindDirection(windDirection):
     return dirs[ix % len(dirs)]
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("weather"),
+@listener(is_plugin=True, outgoing=True, command="weather",
           description="查询天气",
           parameters="<城市>")
 async def weather(context):

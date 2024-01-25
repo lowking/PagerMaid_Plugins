@@ -2,10 +2,10 @@
 
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import lang, alias_command, obtain_message, client
+from pagermaid.utils import lang, obtain_message, client
 
 
-@listener(is_plugin=False, outgoing=True, command=alias_command("jd_cmd"),
+@listener(is_plugin=False, outgoing=True, command="jd_cmd",
           description="解析 JD 口令",
           parameters="<JD 口令>")
 async def jd_cmd(context):

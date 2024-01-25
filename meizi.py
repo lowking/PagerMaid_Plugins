@@ -2,11 +2,10 @@ import random
 from requests import get
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from os import remove
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("mz"),
+@listener(is_plugin=True, outgoing=True, command="mz",
           description="多网站随机获取性感（可能）的写真")
 async def mz(context):
     await context.edit("获取中 . . .")
@@ -68,7 +67,7 @@ async def mz(context):
         await context.client.send_message(context.chat_id, "出错了呜呜呜 ~ 试了好多好多次都无法访问到服务器（没有妹子看啦！） 。")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("sp"),
+@listener(is_plugin=True, outgoing=True, command="sp",
           description="随机获取妹子的视频")
 async def sp(context):
     await context.edit("获取中 . . .")

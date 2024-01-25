@@ -3,11 +3,11 @@ from asyncio import sleep
 from random import uniform
 from telethon.errors.rpcerrorlist import FloodWaitError
 from pagermaid import redis, log, redis_status, version
-from pagermaid.utils import lang, alias_command
+from pagermaid.utils import lang
 from pagermaid.listener import listener
 
 
-@listener(is_plugin=False, outgoing=True, command=alias_command('shift'),
+@listener(is_plugin=False, outgoing=True, command='shift',
           description='开启转发频道新消息功能，需要 Redis',
           parameters="set <from channel> <to channel> 自动转发频道新消息（可以使用频道用户名或者 id）\n"
                      "del <from channel> 删除转发\n"

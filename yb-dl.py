@@ -7,10 +7,9 @@ from youtube_dl.utils import DownloadError
 from re import compile as regex_compile
 from pagermaid import bot, log, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
-@listener(outgoing=True, command=alias_command("ybdl"),
+@listener(outgoing=True, command="ybdl",
           description="上传 Youtube、Bilibili 视频到 telegram",
           parameters="<url>.")
 async def ybdl(context):

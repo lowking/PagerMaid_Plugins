@@ -1,5 +1,4 @@
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from pagermaid import version
 from telethon.tl.types import ChannelParticipantsKicked, ChannelParticipantsAdmins
 from telethon.errors.rpcerrorlist import UserAdminInvalidError, ChatAdminRequiredError, FloodWaitError
@@ -7,7 +6,7 @@ from asyncio import sleep
 from random import uniform
 
 
-@listener(is_plugin=False, outgoing=True, command=alias_command("unbanby"),
+@listener(is_plugin=False, outgoing=True, command="unbanby",
           description='查询/解除群组中被所回复用户所封禁的用户。',
           parameters="<true>")
 async def unban_by_bot(context):

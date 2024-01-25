@@ -2,7 +2,7 @@
 from asyncio import sleep
 from pagermaid.listener import listener
 from pagermaid import persistent_vars, bot
-from pagermaid.utils import client, alias_command
+from pagermaid.utils import client
 import os
 import json
 
@@ -25,7 +25,7 @@ persistent_vars.update(
      }
 )
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("sillyGirl"), ignore_edited=True, parameters="<message>")
+@listener(is_plugin=True, outgoing=True, command="sillyGirl", ignore_edited=True, parameters="<message>")
 async def sillyGirl(context):
     fd = os.open("sillyGirl.egg", os.O_RDWR | os.O_CREAT)
     await context.edit("正在连接到傻妞服务器...")

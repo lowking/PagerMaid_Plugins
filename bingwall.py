@@ -3,7 +3,6 @@ import random
 from requests import get
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from os import remove
 
 
@@ -19,7 +18,7 @@ def get_url(num):
     return url, copyright
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("bingwall"),
+@listener(is_plugin=True, outgoing=True, command="bingwall",
           description="获取Bing每日壁纸")
 async def bingwall(context):
     await context.edit("获取壁纸中 . . .")

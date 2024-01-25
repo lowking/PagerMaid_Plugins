@@ -6,7 +6,7 @@ from PIL import Image
 from collections import defaultdict
 from requests import get
 from pagermaid import version
-from pagermaid.utils import execute, alias_command, pip_install
+from pagermaid.utils import execute, pip_install
 from pagermaid.listener import listener
 
 pip_install("jieba")
@@ -20,7 +20,7 @@ punctuation = {33: ' ', 34: ' ', 35: ' ', 36: ' ', 37: ' ', 38: ' ', 39: ' ', 40
                12290: ' ', 65306: ' ', 65307: ' ', 8217: ' ', 8216: ' ', 8230: ' ', 65509: ' ', 183: ' '}
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("groupword"),
+@listener(is_plugin=True, outgoing=True, command="groupword",
           description="拉取最新 500 条消息生成词云，回复图片可自定义背景图。（图片白色区域为不显示部分）",
           parameters="[任意内容启用AI分词]")
 async def group_word(context):

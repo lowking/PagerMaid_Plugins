@@ -3,7 +3,6 @@ from pagermaid.listener import listener
 from asyncio import sleep
 from datetime import timedelta
 from telethon.tl.types import ChannelParticipantsAdmins
-from pagermaid.utils import alias_command
 
 
 async def removemsg(context, last_name, count):
@@ -18,7 +17,7 @@ async def removemsg(context, last_name, count):
     await context.edit(f'已删除【{last_name}】这个b最近{count_buffer}条污言秽语')
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("kickanddm"),
+@listener(is_plugin=True, outgoing=True, command="kickanddm",
           description="回复你要删除消息和踢的人或者要禁言的人\n指令：\n-k直接删除消息并踢人\n-k 10禁言10秒（tg不支持60秒以下的时间，少于60变成永久）并删除最近999条消息\n⚠️k后面带时间的只是禁言，不带时间的直接踢")
 async def kickanddm(context):
     # 是否在群组

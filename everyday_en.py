@@ -1,10 +1,10 @@
 from pagermaid import version, silent
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, client
+from pagermaid.utils import client
 from os import sep, remove
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("everyday_en"),
+@listener(is_plugin=True, outgoing=True, command="everyday_en",
           description="每日一句英文句子")
 async def everyday(context):
     if not silent:

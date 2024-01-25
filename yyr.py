@@ -1,10 +1,10 @@
 import json
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, client
+from pagermaid.utils import client
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("yyr"),
+@listener(is_plugin=True, outgoing=True, command="yyr",
           description="我们都是孙笑川",
           parameters="<字符串>")
 async def yyr(context):

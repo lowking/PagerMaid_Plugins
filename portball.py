@@ -3,10 +3,9 @@ from pagermaid.listener import listener
 from telethon.errors import rpcerrorlist
 from asyncio import sleep
 from datetime import timedelta
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("portball"),
+@listener(is_plugin=True, outgoing=True, command="portball",
           description="回复你要临时禁言的人的消息来实现XX秒的禁言",
           parameters="<理由>(空格)<时间/秒>")
 async def portball(context):

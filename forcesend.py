@@ -3,7 +3,6 @@
 # By tg @fruitymelon
 
 from pagermaid import version
-from pagermaid.utils import alias_command
 from pagermaid.listener import listener
 
 helpmsg = """在不进群的情况下，强制向频道的附属群内发送消息。需要事先关注频道。
@@ -23,7 +22,7 @@ async def sendmsg(context, chat, origin_text):
     return msg
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("forcesend"),
+@listener(is_plugin=True, outgoing=True, command="forcesend",
           diagnostics=True, ignore_edited=True,
           description=helpmsg,
           parameters="<text>")

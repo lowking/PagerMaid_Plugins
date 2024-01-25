@@ -3,10 +3,10 @@ from json import JSONDecodeError
 from requests import get
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import obtain_message, alias_command
+from pagermaid.utils import obtain_message
 
 
-@listener(outgoing=True, command=alias_command("whois"),
+@listener(outgoing=True, command="whois",
           description="查看域名是否已被注册、注册日期、过期日期、域名状态、DNS解析服务器等。")
 async def whois(context):
     await context.edit("获取中 . . .")

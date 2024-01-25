@@ -1,10 +1,10 @@
 """ Module to automate sticker deletion. """
 from pagermaid import log, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, lang
+from pagermaid.utils import lang
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("findmessage"),
+@listener(is_plugin=True, outgoing=True, command="findmessage",
           description="查找最近 xx 条消息中包含指定关键字的消息，并推送相应链接人名及信息至Log频道。",
           parameters="<关键词>")
 async def fuck_message(context):

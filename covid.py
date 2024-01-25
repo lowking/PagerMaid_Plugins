@@ -4,7 +4,7 @@ import json
 from typing import Dict
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, obtain_message, client
+from pagermaid.utils import obtain_message, client
 
 POLICY_ID = {}
 
@@ -112,7 +112,7 @@ async def get_policy(uid):
 NewsBot = NewsData()
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("covid"),
+@listener(is_plugin=True, outgoing=True, command="covid",
           description="获取新冠疫情信息。",
           parameters="<地区>")
 async def covid_info(context):

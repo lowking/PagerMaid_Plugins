@@ -91,7 +91,7 @@ async def remove_message(context):
             pass
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("autorm"),
+@listener(is_plugin=True, outgoing=True, command="autorm",
           diagnostics=True, ignore_edited=False,
           description=helpmsg,
           parameters="<time>")

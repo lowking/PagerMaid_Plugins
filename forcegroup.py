@@ -1,5 +1,5 @@
 from pagermaid import bot, redis, redis_status, version
-from pagermaid.utils import lang, alias_command
+from pagermaid.utils import lang
 from pagermaid.listener import listener
 from asyncio import sleep
 from telethon.tl.custom.message import Message
@@ -50,7 +50,7 @@ async def force_group_msg(context: Message):
         redis.delete(f"group.chat_id.{context.chat_id}")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command('forcegroup'),
+@listener(is_plugin=True, outgoing=True, command='forcegroup',
           description='自动删除未加入频道讨论群用户的发言。',
           parameters="<true|false|status>")
 async def force_group(context):

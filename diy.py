@@ -3,7 +3,7 @@ from random import randint, choice
 from time import sleep
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, client
+from pagermaid.utils import client
 
 
 def get_api(num):
@@ -39,7 +39,7 @@ def process_web_data(num, req):
     return res
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("diy"),
+@listener(is_plugin=True, outgoing=True, command="diy",
           description="多个随机api。")
 async def diy(context):
     short_name = ['sao', 'qh', 'zn', 'tg', 'ba', 'gs']

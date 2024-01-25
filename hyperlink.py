@@ -2,10 +2,9 @@
 
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("hl"),
+@listener(is_plugin=True, outgoing=True, command="hl",
           description="生成隐藏链接。非链接的纯文字将直接隐藏。",
           parameters="<link>")
 async def hyperlink(context):

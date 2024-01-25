@@ -1,10 +1,9 @@
 from pagermaid.listener import listener
 from telethon import functions, types
-from pagermaid.utils import alias_command
 from pagermaid import version
 
 
-@listener(outgoing=True, command=alias_command("nthmsg"),
+@listener(outgoing=True, command="nthmsg",
           description="获取你发送的第 n 条消息，默认为第一条",
           parameters="<n>")
 async def nthmsg(context):

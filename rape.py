@@ -12,10 +12,9 @@ from telethon.tl.types import ChannelParticipantsAdmins
 from telethon.errors.rpcerrorlist import ChatAdminRequiredError
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, incoming=True, outgoing=True, command=alias_command("rape"),
+@listener(is_plugin=True, incoming=True, outgoing=True, command="rape",
           description="回复你要踢出的人或-rape <TelegramID>")
 async def rape(context):
     reply = await context.get_reply_message()

@@ -6,7 +6,7 @@ from telethon.tl.types import MessageMediaPhoto
 from asyncio import TimeoutError
 from pagermaid import bot, redis, redis_status, version
 from pagermaid.listener import listener
-from pagermaid.utils import obtain_message, alias_command
+from pagermaid.utils import obtain_message
 
 try:
     import aiohttp, aiofiles
@@ -22,7 +22,7 @@ p_headers = {
 p_original = ['i.pixiv.cat', 'i.pximg.net']
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("duckduckgo"),
+@listener(is_plugin=True, outgoing=True, command="duckduckgo",
           description="Duckduckgo 搜索",
           parameters="<query>")
 async def baidu(context):
@@ -40,7 +40,7 @@ async def baidu(context):
     await context.edit(duckduckgo_text)
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("baidu"),
+@listener(is_plugin=True, outgoing=True, command="baidu",
           description="百度搜索",
           parameters="<query>")
 async def baidu(context):
@@ -58,7 +58,7 @@ async def baidu(context):
     await context.edit(baidu_text)
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("caiyun"),
+@listener(is_plugin=True, outgoing=True, command="caiyun",
           description="彩云翻译",
           parameters="<query>")
 async def caiyun_translate(context):
@@ -75,7 +75,7 @@ async def caiyun_translate(context):
     await context.edit(caiyun_text)
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("deepl"),
+@listener(is_plugin=True, outgoing=True, command="deepl",
           description="Deepl 翻译",
           parameters="<query>")
 async def deepl_translate(context):
@@ -93,7 +93,7 @@ async def deepl_translate(context):
     await context.edit(deepl_text)
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("weather"),
+@listener(is_plugin=True, outgoing=True, command="weather",
           description="使用彩云天气 api 查询国内实时天气。",
           parameters="<位置>")
 async def weather(context):
@@ -111,7 +111,7 @@ async def weather(context):
     await context.edit(weather_text)
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("weather_pic"),
+@listener(is_plugin=True, outgoing=True, command="weather_pic",
           description="使用彩云天气 api 查询国内实时天气。",
           parameters="<位置>")
 async def weather_pic(context):
@@ -133,7 +133,7 @@ async def weather_pic(context):
     await context.delete()
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("weather_he"),
+@listener(is_plugin=True, outgoing=True, command="weather_he",
           description="使用和风天气 api 查询国内省市实时天气。",
           parameters="<位置>")
 async def weather_he(context):
@@ -155,7 +155,7 @@ async def weather_he(context):
     await context.delete()
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("pixiv"),
+@listener(is_plugin=True, outgoing=True, command="pixiv",
           description="查询插画信息 （或者回复一条消息）。使用 set [num] 更改镜像源，序号 2 为官方源， 3 为凯露自建源。异步下载需要依赖库 "
                       "aiohttp[speedups] 、 aiofiles",
           parameters="[<图片链接>] <图片序号>")
@@ -240,7 +240,7 @@ async def pixiv(context):
         await context.edit(pixiv_text)
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("whatanime"),
+@listener(is_plugin=True, outgoing=True, command="whatanime",
           description="通过图片查找相似动漫。（需要回复图片）")
 async def whatanime(context):
     reply = await context.get_reply_message()
@@ -305,35 +305,35 @@ async def whatanime(context):
     await context.delete()
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("tts_nan"),
+@listener(is_plugin=True, outgoing=True, command="tts_nan",
           description="通过 Azure 文本到语音 基于字符串生成 简体男声 语音消息。",
           parameters="<字符串>")
 async def az_tts_nan(context):
     await az_tts(context, "")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("tts_nv"),
+@listener(is_plugin=True, outgoing=True, command="tts_nv",
           description="通过 Azure 文本到语音 基于字符串生成 简体女声 语音消息。",
           parameters="<字符串>")
 async def az_tts_nv(context):
     await az_tts(context, "nv")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("tts_tw"),
+@listener(is_plugin=True, outgoing=True, command="tts_tw",
           description="通过 Azure 文本到语音 基于字符串生成 繁体男声 语音消息。",
           parameters="<字符串>")
 async def az_tts_tw(context):
     await az_tts(context, "tw")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("tts_ne"),
+@listener(is_plugin=True, outgoing=True, command="tts_ne",
           description="通过 Azure 文本到语音 基于字符串生成 简体新闻男声 语音消息。",
           parameters="<字符串>")
 async def az_tts_ne(context):
     await az_tts(context, "ne")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("tts_en"),
+@listener(is_plugin=True, outgoing=True, command="tts_en",
           description="通过 Azure 文本到语音 基于字符串生成 英文男声 语音消息。",
           parameters="<字符串>")
 async def az_tts_en(context):

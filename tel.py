@@ -5,10 +5,10 @@ sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 from requests import get
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import obtain_message, alias_command
+from pagermaid.utils import obtain_message
 
 
-@listener(outgoing=True, command=alias_command("tel"),
+@listener(outgoing=True, command="tel",
           description="手机号码归属地等信息查询。")
 async def tel(context):
     await context.edit("获取中 . . .")

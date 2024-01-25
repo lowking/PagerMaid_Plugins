@@ -6,12 +6,11 @@ from os.path import exists
 from re import compile as regex_compile
 from pagermaid import bot, log, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from telethon.tl.types import DocumentAttributeVideo
 from time import sleep
 
 
-@listener(outgoing=True, command=alias_command("vdl"),
+@listener(outgoing=True, command="vdl",
           description="下载 YouTube/bilibili 视频并上传",
           parameters="<url>")
 async def vdl(context):

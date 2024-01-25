@@ -1,10 +1,10 @@
 from asyncio import sleep
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, client
+from pagermaid.utils import client
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("diss"),
+@listener(is_plugin=True, outgoing=True, command="diss",
           description="儒雅随和版祖安语录。")
 async def diss(context):
     await context.edit("获取中 . . .")
@@ -20,7 +20,7 @@ async def diss(context):
     await context.delete()
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("biss"),
+@listener(is_plugin=True, outgoing=True, command="biss",
           description="加带力度版祖安语录。")
 async def biss(context):
     await context.edit("获取中 . . .")

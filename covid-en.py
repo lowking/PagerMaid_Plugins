@@ -1,5 +1,5 @@
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, obtain_message, pip_install
+from pagermaid.utils import obtain_message, pip_install
 from pagermaid import version
 
 pip_install("covid")
@@ -7,7 +7,7 @@ pip_install("covid")
 from covid import Covid
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("covid-en"),
+@listener(is_plugin=True, outgoing=True, command="covid-en",
           description="获取新冠疫情信息。（国家版）",
           parameters="<英文国家名>")
 async def covid_en(context):

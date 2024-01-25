@@ -1,5 +1,4 @@
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from pagermaid import version
 from telethon.tl.types import ChannelParticipantsAdmins
 from telethon.errors.rpcerrorlist import UserAdminInvalidError, ChatAdminRequiredError, FloodWaitError
@@ -17,7 +16,7 @@ def eval_time(context, msg, day):
         return True
 
 
-@listener(is_plugin=False, outgoing=True, command=alias_command("fuckmember"),
+@listener(is_plugin=False, outgoing=True, command="fuckmember",
           description='查找/清理群组中所有潜水超过 n 天的成员。（n>=7）。',
           parameters="<day> <true>")
 async def fuck_member(context):

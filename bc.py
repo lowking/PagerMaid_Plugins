@@ -13,7 +13,7 @@ import urllib.request
 from telethon.tl.custom.message import Message
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import execute, alias_command, pip_install
+from pagermaid.utils import execute, pip_install
 
 pip_install("python-binance", alias="binance")
 pip_install("xmltodict")
@@ -45,7 +45,7 @@ def init() -> None:
             raise e
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("bc"),
+@listener(is_plugin=True, outgoing=True, command="bc",
           description="coins",
           parameters="<num> <coin1> <coin2>")
 async def coin(context: Message) -> None:

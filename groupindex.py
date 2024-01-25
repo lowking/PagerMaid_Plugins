@@ -2,11 +2,10 @@ import datetime
 from pytz import timezone
 from telethon.tl.functions.users import GetFullUserRequest
 from pagermaid import version
-from pagermaid.utils import alias_command
 from pagermaid.listener import listener
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("groupindex"),
+@listener(is_plugin=True, outgoing=True, command="groupindex",
           description="获取群组当日活跃数据")
 async def group_index(context):
     if not context.is_group:

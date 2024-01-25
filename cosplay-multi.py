@@ -2,11 +2,10 @@ from random import randint, random
 from requests import get
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from os import remove
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("cosm"),
+@listener(is_plugin=True, outgoing=True, command="cosm",
           description="多网站随机获取cosplay图片，会自动重试哦")
 async def cosm(context):
     await context.edit("获取中 . . .")

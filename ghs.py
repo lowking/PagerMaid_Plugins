@@ -3,10 +3,9 @@ from requests import get
 from pagermaid import version
 from pagermaid.listener import listener
 from os import remove
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("ghs"),
+@listener(is_plugin=True, outgoing=True, command="ghs",
           description="随机获取涩情写真")
 async def ghs(context):
     await context.edit("搞颜色中 . . .")

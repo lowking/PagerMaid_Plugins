@@ -6,7 +6,6 @@ from random import choice
 import pytz
 from pagermaid import bot, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 thumbnails = (
     "https://s2.loli.net/2021/12/20/8yJiTKYwdt6ro7z.png",
@@ -84,7 +83,7 @@ def gen_text():
 
 
 @listener(is_plugin=True, outgoing=True,
-          command=alias_command("moyu"),
+          command="moyu",
           description="摸鱼真开心")
 async def moyu(context):
     text = gen_text()

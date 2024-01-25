@@ -1,11 +1,10 @@
 from asyncio import sleep
 from pagermaid import log, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from telethon.errors import PeerFloodError
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("da"),
+@listener(is_plugin=True, outgoing=True, command="da",
           description="以此命令删除所有消息。（非群组管理员只删除自己的消息）",
           parameters="<text>")
 async def da(context):

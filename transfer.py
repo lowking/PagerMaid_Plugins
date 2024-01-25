@@ -3,7 +3,6 @@ from io import BytesIO
 from os.path import exists, isfile
 from pagermaid import bot, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
 async def make_zip(source_dir, output_filename):
@@ -25,7 +24,7 @@ async def del_msg(context, t_lim):
         pass
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("transfer"),
+@listener(is_plugin=True, outgoing=True, command="transfer",
           description="上传 / 下载文件",
           parameters="upload <filepath>` 或 `download <filepath>")
 async def transfer(context):

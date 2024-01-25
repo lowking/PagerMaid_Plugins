@@ -13,7 +13,6 @@ from telethon.tl.types import (
     InputStickerSetID,
 )
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 lottie_import = True
 try:
@@ -23,7 +22,7 @@ except ImportError:
     lottie_import = False
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("getstickers"),
+@listener(is_plugin=True, outgoing=True, command="getstickers",
           description="获取整个贴纸包的贴纸，false 关闭 tgs 转 gif；任意值开启下载所有贴纸包；\n"
                       "转 gif 需要手动安装 pypi 依赖 lottie[gif] \n"
                       "Ubuntu 转换出错请先运行 `-sh apt install libpangocairo-1.0-0 -y`。",

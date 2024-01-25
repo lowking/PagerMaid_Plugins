@@ -1,11 +1,10 @@
 from telethon.tl.types import ChannelParticipantsAdmins
 from pagermaid import version
-from pagermaid.utils import alias_command
 from pagermaid.listener import listener
 import time
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("atadmins"),
+@listener(is_plugin=True, outgoing=True, command="atadmins",
           description="一键 AT 本群管理员（仅在群组中有效）",
           parameters="回复消息(可选) <要说的话(可选)>")
 async def atadmins(context):
@@ -36,7 +35,7 @@ async def atadmins(context):
     await context.delete()
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("atall"),
+@listener(is_plugin=True, outgoing=True, command="atall",
           description="一键 AT 本群成员（仅在群组中有效）",
           parameters="回复消息(可选) <要说的话(可选)>")
 async def atall(context):

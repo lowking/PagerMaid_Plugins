@@ -12,7 +12,7 @@ from PyDictionary import PyDictionary
 dictionary = PyDictionary()
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("dictionary"),
+@listener(is_plugin=True, outgoing=True, command="dictionary",
           description="查询英语单词的意思")
 async def get_word_mean(context: NewMessage.Event) -> None:
     """ Look up a word in the dictionary. """
@@ -37,7 +37,7 @@ async def get_word_mean(context: NewMessage.Event) -> None:
         await context.edit("[dictionary] 无法查询到单词的意思")
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("urbandictionary"),
+@listener(is_plugin=True, outgoing=True, command="urbandictionary",
           description="解释英语俚语词汇")
 async def get_urban_mean(context: NewMessage.Event) -> None:
     """ To fetch meaning of the given word from urban dictionary. """

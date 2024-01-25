@@ -11,7 +11,6 @@ from telethon.tl.types import MessageMediaPhoto, MessageMediaWebPage, MessageMed
 from asyncio import TimeoutError
 from pagermaid import bot, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
 def font(path, size):
@@ -112,7 +111,7 @@ async def yv_lu_process_sticker(name, photo, sticker, path):
     result.save(f'{path}result.png')
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("yvlu"),
+@listener(is_plugin=True, outgoing=True, command="yvlu",
           description="将回复的消息或者输入的字符串转换成语录")
 async def yv_lu(context):
     reply = await context.get_reply_message()
@@ -148,7 +147,7 @@ async def yv_lu(context):
     await context.delete()
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("yvlu_"),
+@listener(is_plugin=True, outgoing=True, command="yvlu_",
           description="将回复的消息转换成语录")
 async def yv_lu_(context):
     if not context.reply_to_msg_id:

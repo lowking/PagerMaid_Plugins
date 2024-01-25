@@ -7,7 +7,7 @@ from requests import get
 from sys import executable
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, pip_install
+from pagermaid.utils import pip_install
 
 pip_install("bs4")
 
@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 from urllib import parse
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("pl"),
+@listener(is_plugin=True, outgoing=True, command="pl",
           description="输入【-pl 食物名】查询食物嘌呤含量",
           parameters="<食物名>")
 async def pl(context):

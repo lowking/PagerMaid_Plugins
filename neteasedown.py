@@ -149,7 +149,7 @@ i.e.
 """
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("ned"),
+@listener(is_plugin=True, outgoing=True, command="ned",
           description=ned_help_msg,
           parameters="{关键词/id}/{login <账号> <密码>}/{clear}")
 async def ned(context):

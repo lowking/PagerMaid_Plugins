@@ -3,10 +3,10 @@ import requests
 from urllib.parse import quote
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, obtain_message, lang, clear_emojis
+from pagermaid.utils import obtain_message, lang, clear_emojis
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("chatbot"),
+@listener(is_plugin=True, outgoing=True, command="chatbot",
           description="使用自然语言处理 (NLP) 来帮助用户通过文本进行交互。（支持回复）",
           parameters="<字符串>")
 async def chatbot(context):

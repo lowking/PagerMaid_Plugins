@@ -19,7 +19,6 @@ from telethon.tl.functions.messages import GetStickerSetRequest
 from telethon.tl.types import InputStickerSetID
 from pagermaid import log, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
 async def ars_check(message: Message) -> None:
@@ -166,7 +165,7 @@ def process_link(chatid: int, msgid: int) -> str:
     return link
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("ars"))
+@listener(is_plugin=True, outgoing=True, command="ars")
 async def ars(context):
     if not exists('./plugins/autoreplysticker'):
         mkdir('./plugins/autoreplysticker')

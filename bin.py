@@ -3,10 +3,10 @@ import requests
 from json.decoder import JSONDecodeError
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import obtain_message, alias_command
+from pagermaid.utils import obtain_message
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("bin"), 
+@listener(is_plugin=True, outgoing=True, command="bin",
           description="查询信用卡信息", 
           parameters="<bin（4到8位数字）>")
 async def card(context):

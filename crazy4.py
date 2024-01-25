@@ -1,7 +1,6 @@
 from secrets import choice
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 data = [
     "大家好，我是秦始皇，其实我并没有死，我在西安有100000吨黄金，今天肯德基疯狂星期四，我现在需要有人来请我吃29.9块钱8只蛋挞。我明天直接带部队复活，让你统领三军! ​​​",
@@ -50,7 +49,7 @@ data = [
 ]
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("crazy4"),
+@listener(is_plugin=True, outgoing=True, command="crazy4",
           description="天天疯狂！随机输出KFC疯狂星期四文案。")
 async def crazy4(context):
     await context.edit(choice(data))

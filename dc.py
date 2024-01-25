@@ -2,11 +2,11 @@ from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.types import MessageEntityMentionName, MessageEntityPhone
 from struct import error as StructError
 from pagermaid import bot, log, silent, version
-from pagermaid.utils import lang, alias_command
+from pagermaid.utils import lang
 from pagermaid.listener import listener
 
 
-@listener(is_plugin=False, outgoing=True, command=alias_command('dc'),
+@listener(is_plugin=False, outgoing=True, command='dc',
           description="获取指定用户的 DC",
           parameters="<username/id>")
 async def dc(context):

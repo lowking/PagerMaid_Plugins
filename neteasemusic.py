@@ -9,7 +9,6 @@ import math
 from time import sleep
 from pagermaid.listener import listener
 from pagermaid import bot, version
-from pagermaid.utils import alias_command
 from os import remove, path, mkdir, getcwd
 from os.path import exists
 from collections import defaultdict
@@ -20,7 +19,7 @@ class RetryError(Exception):  # 重试错误，用于再次重试
     pass
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("nem"),
+@listener(is_plugin=True, outgoing=True, command="nem",
           description="网易云搜/点歌。\n指令s为搜索，p为点歌，id为歌曲ID点歌，r为随机热歌(无关键词)\n搜索在s后添加数字如`-nem` `s8` "
                       "`<关键词>`调整结果数量\n搜索灰色歌曲请尽量**指定歌手**\n可回复搜索结果消息`-nem` `p` `<歌曲数字序号>`点歌",
           parameters="<指令> <关键词>")

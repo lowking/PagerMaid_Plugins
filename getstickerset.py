@@ -8,10 +8,9 @@ from PIL import Image
 from pytz import timezone
 from pagermaid import bot, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("getstickerset"),
+@listener(is_plugin=True, outgoing=True, command="getstickerset",
           description="获取所回复贴纸的贴纸包信息。")
 async def get_sticker_set(context: Message):
     """ get sticker set """

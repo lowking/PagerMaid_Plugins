@@ -1,9 +1,8 @@
 from pagermaid import redis, redis_status, log, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("repeat"),
+@listener(is_plugin=True, outgoing=True, command="repeat",
           description='自动复读（无引用）一个人的消息。',
           parameters="<[reply]|status>")
 async def repeat(context):

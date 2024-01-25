@@ -11,7 +11,6 @@ from telethon.errors.rpcerrorlist import ChatSendStickersForbiddenError
 from struct import error as StructError
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
 def crop_max_square(pil_img):
@@ -38,7 +37,7 @@ def mask_circle_transparent(pil_img, blur_radius, offset=0):
     return result
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("diu"),
+@listener(is_plugin=True, outgoing=True, command="diu",
           description="生成一张 扔头像 图片，（可选：当第二个参数存在时，旋转用户头像 180°）",
           parameters="<username/uid> [随意内容]")
 async def throwit(context):

@@ -2,11 +2,10 @@ from time import sleep
 from os.path import exists
 from os import mkdir, remove
 from pagermaid import version
-from pagermaid.utils import alias_command
 from pagermaid.listener import listener
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("aff"),
+@listener(is_plugin=True, outgoing=True, command="aff",
           description="在别人要打算买机场的时候光速发出自己的aff信息(请尽量配合短链接)",
           parameters="<save|remove> (可选，用于保存|删除aff信息)")
 async def aff(context):

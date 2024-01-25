@@ -11,10 +11,9 @@ from asyncio import sleep
 from telethon.errors.common import MultiError
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("paolu"),
+@listener(is_plugin=True, outgoing=True, command="paolu",
           description="⚠一键跑路 删除群内消息并禁言⚠")
 async def paolu(context):
     """一键跑路 删除群内消息并禁言"""

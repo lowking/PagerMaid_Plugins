@@ -1,9 +1,9 @@
 from base64 import b64decode, b64encode
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import attach_log, execute, alias_command, obtain_message
+from pagermaid.utils import attach_log, execute, obtain_message
 
-@listener(outgoing=True, command=alias_command("b64e"),
+@listener(outgoing=True, command="b64e",
           description="将文本转为Base64"
           ,parameters="<text>")
 async def b64e(context):
@@ -20,7 +20,7 @@ async def b64e(context):
         await context.edit(f"`{result}`")
 
 
-@listener(outgoing=True, command=alias_command("b64d"),
+@listener(outgoing=True, command="b64d",
           description="将Base64转为文本"
           ,parameters="<text>")
 async def b64d(context):

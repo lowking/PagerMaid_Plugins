@@ -2,10 +2,9 @@
 from asyncio import sleep
 from pagermaid import log, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("fucksticker"),
+@listener(is_plugin=True, outgoing=True, command="fucksticker",
           description="删除最近 50 条消息中的 sticker 。"
                       "无管理员权限将只删除自己发送的 sticker 。")
 async def fucksticker(context):

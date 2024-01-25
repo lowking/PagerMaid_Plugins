@@ -10,7 +10,7 @@ from telethon.errors.rpcerrorlist import MessageNotModifiedError
 
 from pagermaid import log
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, pip_install, client
+from pagermaid.utils import pip_install, client
 
 try:
     from retry import retry
@@ -157,7 +157,7 @@ async def download(url: str):
     return name
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("bup"),
+@listener(is_plugin=True, outgoing=True, command="bup",
           description="上传B站动态到TG\nUsage: ```-bup <动态url>```\n"
                       "```-bup <atag|dtag|ctag>```\n"
                       "* 关住[嘉然](https://www.bilibili.com/video/BV19Z4y1k7P7)，炖炖解馋", parameters="<url>")

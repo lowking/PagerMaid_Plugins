@@ -1,9 +1,9 @@
 from pagermaid import version, silent
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, client
+from pagermaid.utils import client
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("news"),
+@listener(is_plugin=True, outgoing=True, command="news",
           description="每日新闻、历史上的今天、天天成语、慧语香风、诗歌天地")
 async def news(context):
     if not silent:

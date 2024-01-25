@@ -3,7 +3,7 @@ from asyncio import sleep
 from sys import executable
 from pagermaid import log, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, execute
+from pagermaid.utils import execute
 
 imported = True
 try:
@@ -46,7 +46,7 @@ def chs2yin(s, chaosrate =0.8):
     return ''.join(chaos (x, y, chaosrate) for x, y in pseg.cut(s))
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("yinglish"),
+@listener(is_plugin=True, outgoing=True, command="yinglish",
           description="能把中文和英文翻译成淫语的翻译机！",
           parameters="<message>|要转换的内容")
 async def yinglish(context):

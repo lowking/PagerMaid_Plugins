@@ -11,10 +11,9 @@ from asyncio import sleep
 from telethon.tl.custom.message import Message
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("dmfg"))
+@listener(is_plugin=True, outgoing=True, command="dmfg")
 async def dmfg(context: Message) -> None:
     if len(context.parameter) == 0:
         await context.edit('您没有输入参数.\n`-dmfg group` 删除所有群内发言\n`-dmfg private` 删除所有与人的对话消息')

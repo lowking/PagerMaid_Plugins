@@ -3,11 +3,10 @@ import random
 import requests
 from pagermaid import version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command
 from os import remove
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("acgm"),
+@listener(is_plugin=True, outgoing=True, command="acgm",
           description="多网站随机获取二刺螈（bushi） ACG图片")
 async def joke(context):
     await context.edit("获取中 . . .")

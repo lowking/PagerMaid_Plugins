@@ -6,7 +6,7 @@ import sys, time, traceback
 import asyncio
 from pagermaid import log, version
 from pagermaid.listener import listener
-from pagermaid.utils import alias_command, pip_install
+from pagermaid.utils import pip_install
 
 pip_install("dateparser")
 
@@ -67,7 +67,7 @@ i.e.
 """
 
 
-@listener(is_plugin=True, outgoing=True, command=alias_command("sendat"), diagnostics=True, ignore_edited=True,
+@listener(is_plugin=True, outgoing=True, command="sendat", diagnostics=True, ignore_edited=True,
           description=helpmsg,
           parameters="<atmsg>")
 async def sendatwrap(context):
@@ -227,7 +227,7 @@ async def sendat(context):
         return
 
 
-@listener(outgoing=True, command=alias_command("sendatdump"), diagnostics=True, ignore_edited=True,
+@listener(outgoing=True, command="sendatdump", diagnostics=True, ignore_edited=True,
           description="导出并转储内存中的 sendat 配置")
 async def sendatdump(context):
     clean_mem = mem[:]
@@ -238,7 +238,7 @@ async def sendatdump(context):
     await context.edit(".\n-sendat " + "\n-sendat ".join(clean_mem))
 
 
-@listener(outgoing=True, command=alias_command("sendatparse"), diagnostics=True, ignore_edited=True,
+@listener(outgoing=True, command="sendatparse", diagnostics=True, ignore_edited=True,
           description="导入已导出的 sendat 配置。用法：-sendatparse 在此处粘贴 -sendatdump 命令的输出结果")
 async def sendatparse(context):
     chat = await context.get_chat()
