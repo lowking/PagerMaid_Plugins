@@ -12,7 +12,7 @@ def make_reply_msg(context, sourceText, prefix):
     tag = ""
     remark = ""
     # 获取标签
-    if prefix:
+    if prefix and context.text.startswith(prefix):
         msgs = context.text[len(prefix):].split("！")
     else:
         msgs = context.text[1:].split("！")
