@@ -2,7 +2,7 @@
     "list": [
         {
             "name": "autorespond",
-            "version": "0.212",
+            "version": "0.213",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "1.9 kb",
@@ -22,7 +22,7 @@
         },
         {
             "name": "autorm",
-            "version": "1.033",
+            "version": "1.034",
             "section": "chat",
             "maintainer": "fruitymelon",
             "size": "6.7 kb",
@@ -32,7 +32,7 @@
         },
         {
             "name": "sendat",
-            "version": "1.322",
+            "version": "1.323",
             "section": "chat",
             "maintainer": "fruitymelon",
             "size": "15.0 kb",
@@ -42,7 +42,7 @@
         },
         {
             "name": "weather",
-            "version": "1.111",
+            "version": "1.112",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "2.9 kb",
@@ -52,7 +52,7 @@
         },
         {
             "name": "xtao-some",
-            "version": "1.23",
+            "version": "1.24",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "12.9 kb",
@@ -62,7 +62,7 @@
         },
         {
             "name": "yb-dl",
-            "version": "1.031",
+            "version": "1.032",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "18.8 kb",
@@ -72,7 +72,7 @@
         },
         {
             "name": "throwit",
-            "version": "1.622",
+            "version": "1.623",
             "section": "profile",
             "maintainer": "xtaodada",
             "size": "6.9 kb",
@@ -82,7 +82,7 @@
         },
         {
             "name": "rate",
-            "version": "1.411",
+            "version": "1.412",
             "section": "daily",
             "maintainer": "fruitymelon",
             "size": "3.4 kb",
@@ -92,7 +92,7 @@
         },
         {
             "name": "netease",
-            "version": "1.311",
+            "version": "1.312",
             "section": "daily",
             "maintainer": "xtaodada、KorenKrita",
             "size": "0.7 kb",
@@ -102,7 +102,7 @@
         },
         {
             "name": "atadmins_atall",
-            "version": "1.121",
+            "version": "1.122",
             "section": "chat",
             "maintainer": "Pentacene",
             "size": "2.5 kb",
@@ -112,7 +112,7 @@
         },
         {
             "name": "denyu",
-            "version": "1.12",
+            "version": "1.13",
             "section": "chat",
             "maintainer": "fruitymelon",
             "size": "2.7 kb",
@@ -122,7 +122,7 @@
         },
         {
             "name": "hyperlink",
-            "version": "1.011",
+            "version": "1.012",
             "section": "daily",
             "maintainer": "OahiewUoil",
             "size": "0.5 kb",
@@ -132,7 +132,7 @@
         },
         {
             "name": "nthmsg",
-            "version": "1.021",
+            "version": "1.022",
             "section": "chat",
             "maintainer": "seiuneko",
             "size": "0.9 kb",
@@ -142,7 +142,7 @@
         },
         {
             "name": "portball",
-            "version": "1.453",
+            "version": "1.454",
             "section": "chat",
             "maintainer": "Pentacene",
             "size": "2.8 kb",
@@ -152,7 +152,7 @@
         },
         {
             "name": "resou",
-            "version": "1.221",
+            "version": "1.222",
             "section": "daily",
             "maintainer": "KorenKrita、xtaodada、monsterxcn",
             "size": "6.1 kb",
@@ -162,7 +162,7 @@
         },
         {
             "name": "mjx",
-            "version": "1.011",
+            "version": "1.012",
             "section": "profile",
             "maintainer": "KorenKrita",
             "size": "1 kb",
@@ -172,7 +172,7 @@
         },
         {
             "name": "tel",
-            "version": "1.111",
+            "version": "1.112",
             "section": "daily",
             "maintainer": "KorenKrita、xtaodada",
             "size": "1 kb",
@@ -182,7 +182,7 @@
         },
         {
             "name": "whois",
-            "version": "1.141",
+            "version": "1.142",
             "section": "daily",
             "maintainer": "KorenKrita",
             "size": "1.1 kb",
@@ -192,7 +192,7 @@
         },
         {
             "name": "eat",
-            "version": "1.050",
+            "version": "1.051",
             "section": "profile",
             "maintainer": "SF_PICK",
             "size": "22.3 kb",
@@ -202,7 +202,7 @@
         },
         {
             "name": "cosplay-multi",
-            "version": "1.311",
+            "version": "1.312",
             "section": "daily",
             "maintainer": "TNTcraftHIM",
             "size": "2.4 kb",
@@ -212,7 +212,7 @@
         },
         {
             "name": "meizi",
-            "version": "1.811",
+            "version": "1.812",
             "section": "daily",
             "maintainer": "TNTcraftHIM",
             "size": "4.0 kb",
@@ -222,7 +222,7 @@
         },
         {
             "name": "acg-multi",
-            "version": "1.411",
+            "version": "1.412",
             "section": "daily",
             "maintainer": "TNTcraftHIM",
             "size": "2.4 kb",
@@ -232,7 +232,7 @@
         },
         {
             "name": "da",
-            "version": "1.022",
+            "version": "1.023",
             "section": "chat",
             "maintainer": "yxkumad",
             "size": "1.6 kb",
@@ -242,7 +242,7 @@
         },
         {
             "name": "diss",
-            "version": "1.114",
+            "version": "1.115",
             "section": "chat",
             "maintainer": "TNTcraftHIM",
             "size": "1.4 kb",
@@ -252,7 +252,7 @@
         },
         {
             "name": "shangliu",
-            "version": "1.02",
+            "version": "1.03",
             "section": "chat",
             "maintainer": "TNTcraftHIM",
             "size": "2.6 kb",
@@ -262,7 +262,7 @@
         },
         {
             "name": "neteaseshuffle",
-            "version": "1.113",
+            "version": "1.114",
             "section": "daily",
             "maintainer": "TNTcraftHIM",
             "size": "3.0 kb",
@@ -272,7 +272,7 @@
         },
         {
             "name": "neteasedown",
-            "version": "1.231",
+            "version": "1.232",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "12.8 kb",
@@ -282,7 +282,7 @@
         },
         {
             "name": "killallmembers",
-            "version": "1.121",
+            "version": "1.122",
             "section": "chat",
             "maintainer": "Pentacene",
             "size": "idk",
@@ -292,7 +292,7 @@
         },
         {
             "name": "videodl",
-            "version": "0.122",
+            "version": "0.123",
             "section": "daily",
             "maintainer": "TNTcraftHIM",
             "size": "5.3 kb",
@@ -302,7 +302,7 @@
         },
         {
             "name": "aff",
-            "version": "1.211",
+            "version": "1.212",
             "section": "chat",
             "maintainer": "TNTcraftHIM",
             "size": "2.0 kb",
@@ -312,7 +312,7 @@
         },
         {
             "name": "stickertopic",
-            "version": "1.121",
+            "version": "1.122",
             "section": "chat",
             "maintainer": "TNTcraftHIM",
             "size": "3.5 kb",
@@ -322,7 +322,7 @@
         },
         {
             "name": "vip",
-            "version": "0.72",
+            "version": "0.73",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "14.4 kb",
@@ -332,7 +332,7 @@
         },
         {
             "name": "calculator",
-            "version": "1.1",
+            "version": "1.2",
             "section": "chat",
             "maintainer": "Pentacene,zhxycn",
             "size": "1.48 kb",
@@ -342,7 +342,7 @@
         },
         {
             "name": "paolu",
-            "version": "1.022",
+            "version": "1.023",
             "section": "chat",
             "maintainer": "Pentacene",
             "size": "1.0 kb",
@@ -352,7 +352,7 @@
         },
         {
             "name": "autoreplysticker",
-            "version": "1.233",
+            "version": "1.234",
             "section": "chat",
             "maintainer": "Pentacene",
             "size": "12 kb",
@@ -362,7 +362,7 @@
         },
         {
             "name": "deletemsgsfromgrps",
-            "version": "1.021",
+            "version": "1.022",
             "section": "chat",
             "maintainer": "Pentacene",
             "size": "4 kb",
@@ -372,7 +372,7 @@
         },
         {
             "name": "keyword",
-            "version": "2.704",
+            "version": "2.705",
             "section": "chat",
             "maintainer": "c3b2a,xtaodada",
             "size": "47.6 kb",
@@ -382,7 +382,7 @@
         },
         {
             "name": "transfer",
-            "version": "1.021",
+            "version": "1.022",
             "section": "daily",
             "maintainer": "c3b2a",
             "size": "2.7 kb",
@@ -392,7 +392,7 @@
         },
         {
             "name": "xjj",
-            "version": "1.021",
+            "version": "1.022",
             "section": "daily",
             "maintainer": "Moriarty-989",
             "size": "1.4 kb",
@@ -402,7 +402,7 @@
         },
         {
             "name": "zpr",
-            "version": "1.011",
+            "version": "1.012",
             "section": "daily",
             "maintainer": "Moriarty-989",
             "size": "1.4 kb",
@@ -412,7 +412,7 @@
         },
         {
             "name": "forcesend",
-            "version": "1.011",
+            "version": "1.012",
             "section": "chat",
             "maintainer": "fruitymelon",
             "size": "1.3 kb",
@@ -422,7 +422,7 @@
         },
         {
             "name": "ghs",
-            "version": "1.011",
+            "version": "1.012",
             "section": "chat",
             "maintainer": "akun",
             "size": "1.3 kb",
@@ -432,7 +432,7 @@
         },
         {
             "name": "bc",
-            "version": "1.232",
+            "version": "1.233",
             "section": "chat",
             "maintainer": "Pentacene",
             "size": "8.0 kb",
@@ -442,7 +442,7 @@
         },
         {
             "name": "diy",
-            "version": "1.012",
+            "version": "1.013",
             "section": "chat",
             "maintainer": "ahhhiiii,xtaodada",
             "size": "2.9 kb",
@@ -452,7 +452,7 @@
         },
         {
             "name": "bingwall",
-            "version": "1.011",
+            "version": "1.012",
             "section": "chat",
             "maintainer": "ahhhiiii",
             "size": "1.9 kb",
@@ -462,7 +462,7 @@
         },
         {
             "name": "pl",
-            "version": "1.032",
+            "version": "1.033",
             "section": "chat",
             "maintainer": "lowking",
             "size": "4.0 kb",
@@ -472,7 +472,7 @@
         },
         {
             "name": "rape",
-            "version": "1.034",
+            "version": "1.035",
             "section": "chat",
             "maintainer": "Pentacene",
             "size": "4.0 kb",
@@ -482,7 +482,7 @@
         },
         {
             "name": "fuck",
-            "version": "1.024",
+            "version": "1.025",
             "section": "chat",
             "maintainer": "Pentacene",
             "size": "4.0 kb",
@@ -492,7 +492,7 @@
         },
         {
             "name": "groupword",
-            "version": "1.1",
+            "version": "1.2",
             "section": "chat",
             "maintainer": "xtaodada, matsuri_nya",
             "size": "4.5 kb",
@@ -512,7 +512,7 @@
         },
         {
             "name": "getstickers",
-            "version": "1.112",
+            "version": "1.113",
             "section": "chat",
             "maintainer": "xtaodada,Vesugierii",
             "size": "5.4 kb",
@@ -522,7 +522,7 @@
         },
         {
             "name": "fucksticker",
-            "version": "1.01",
+            "version": "1.02",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "1.14 kb",
@@ -532,7 +532,7 @@
         },
         {
             "name": "pic2sticker",
-            "version": "1.011",
+            "version": "1.012",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "4.7 kb",
@@ -542,7 +542,7 @@
         },
         {
             "name": "listusernames",
-            "version": "1.01",
+            "version": "1.02",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "0.7 kb",
@@ -552,7 +552,7 @@
         },
         {
             "name": "fuckadmin",
-            "version": "1.111",
+            "version": "1.112",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "2.9 kb",
@@ -562,7 +562,7 @@
         },
         {
             "name": "bin",
-            "version": "1.021",
+            "version": "1.022",
             "section": "daily",
             "maintainer": "paulkm",
             "size": "1.8 kb",
@@ -572,7 +572,7 @@
         },
         {
             "name": "fuckmember",
-            "version": "1.034",
+            "version": "1.035",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "3.0 kb",
@@ -582,7 +582,7 @@
         },
         {
             "name": "unbanby",
-            "version": "1.011",
+            "version": "1.012",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "2.8 kb",
@@ -592,7 +592,7 @@
         },
         {
             "name": "forcesubscribe",
-            "version": "1.061",
+            "version": "1.062",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "4.2 kb",
@@ -602,7 +602,7 @@
         },
         {
             "name": "forcegroup",
-            "version": "1.021",
+            "version": "1.022",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "3.6 kb",
@@ -612,7 +612,7 @@
         },
         {
             "name": "repeat",
-            "version": "1.01",
+            "version": "1.02",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "1.8 kb",
@@ -622,7 +622,7 @@
         },
         {
             "name": "kickanddm",
-            "version": "1.01",
+            "version": "1.02",
             "section": "chat",
             "maintainer": "lowking",
             "size": "5.6 kb",
@@ -632,7 +632,7 @@
         },
         {
             "name": "fuckmessage",
-            "version": "1.011",
+            "version": "1.012",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "1.3 kb",
@@ -642,7 +642,7 @@
         },
         {
             "name": "yyr",
-            "version": "1.011",
+            "version": "1.012",
             "section": "chat",
             "maintainer": "xtaodada、kld",
             "size": "0.9 kb",
@@ -652,7 +652,7 @@
         },
         {
             "name": "chatbot",
-            "version": "1.01",
+            "version": "1.02",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "1.2 kb",
@@ -662,7 +662,7 @@
         },
         {
             "name": "square",
-            "version": "1.01",
+            "version": "1.02",
             "section": "chat",
             "maintainer": "Vesugierii",
             "size": "1.2 kb",
@@ -672,7 +672,7 @@
         },
         {
             "name": "groupindex",
-            "version": "1.123",
+            "version": "1.124",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "3.2 kb",
@@ -682,7 +682,7 @@
         },
         {
             "name": "yvlu",
-            "version": "1.23",
+            "version": "1.24",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "10.4 kb",
@@ -692,7 +692,7 @@
         },
         {
             "name": "antichannelmsg",
-            "version": "1.02",
+            "version": "1.03",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "4.8 kb",
@@ -702,7 +702,7 @@
         },
         {
             "name": "antichannelpin",
-            "version": "1.01",
+            "version": "1.02",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "2.8 kb",
@@ -712,7 +712,7 @@
         },
         {
             "name": "shift",
-            "version": "1.031",
+            "version": "1.032",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "5.3 kb",
@@ -722,7 +722,7 @@
         },
         {
             "name": "getstickerset",
-            "version": "1.011",
+            "version": "1.012",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "4.4 kb",
@@ -732,7 +732,7 @@
         },
         {
             "name": "autodel",
-            "version": "1.01",
+            "version": "1.02",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "5.7 kb",
@@ -752,7 +752,7 @@
         },
         {
             "name": "yinglish",
-            "version": "1.001",
+            "version": "1.002",
             "section": "chat",
             "maintainer": "YU",
             "size": "1.7 kb",
@@ -762,7 +762,7 @@
         },
         {
             "name": "findmessage",
-            "version": "1.001",
+            "version": "1.003",
             "section": "chat",
             "maintainer": "vesugier",
             "size": "1.44 kb",
@@ -772,7 +772,7 @@
         },
         {
             "name": "epic",
-            "version": "1.011",
+            "version": "1.012",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "5.80 kb",
@@ -782,7 +782,7 @@
         },
         {
             "name": "covid-en",
-            "version": "1.01",
+            "version": "1.02",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "1.70 kb",
@@ -802,7 +802,7 @@
         },
         {
             "name": "moyu",
-            "version": "1.021",
+            "version": "1.022",
             "section": "daily",
             "maintainer": "sam01101",
             "size": "3.00 kb",
@@ -832,7 +832,7 @@
         },
         {
             "name": "dc",
-            "version": "1.1",
+            "version": "1.2",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "3.0 kb",
@@ -852,7 +852,7 @@
         },
         {
             "name": "silly_girl",
-            "version": "1.042",
+            "version": "1.043",
             "section": "chat",
             "maintainer": "cdle",
             "size": "3 kb",
@@ -872,7 +872,7 @@
         },
         {
             "name": "dictionary",
-            "version": "1.00",
+            "version": "1.01",
             "section": "chat",
             "maintainer": "xtaodada",
             "size": "2.4 kb",
@@ -882,7 +882,7 @@
         },
         {
             "name": "base64",
-            "version": "1.00",
+            "version": "1.01",
             "section": "chat",
             "maintainer": "zhxycn,xtaodada",
             "size": "1.4 kb",
@@ -902,7 +902,7 @@
         },
         {
             "name": "news",
-            "version": "1.0",
+            "version": "1.1",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "1.3 kb",
@@ -912,7 +912,7 @@
         },
         {
             "name": "everyday_en",
-            "version": "1.0",
+            "version": "1.1",
             "section": "daily",
             "maintainer": "xtaodada",
             "size": "1.0 kb",
@@ -922,7 +922,7 @@
         },
         {
             "name": "bili_item_upload",
-            "version": "1.0",
+            "version": "1.1",
             "section": "chat",
             "maintainer": "CaroyalKnight",
             "size": "11.2 kb",
@@ -932,7 +932,7 @@
         },
         {
             "name": "selfDestruct",
-            "version": "1.2",
+            "version": "1.3",
             "section": "chat",
             "maintainer": "lowking",
             "size": "23 kb",
