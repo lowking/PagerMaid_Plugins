@@ -6,6 +6,7 @@ from collections import defaultdict
 
 from pagermaid import redis, redis_status, log, bot, logs
 from pagermaid.listener import listener
+from pagermaid.AsyncTask import AsyncTask
 from telethon import functions, types
 
 if not redis_status():
@@ -585,7 +586,8 @@ async def sendReaction(client, chatId, messageId, emoticon):
         raise e
 
 
-async def checkMessage():
+@AsyncTask(name="checkMessage")
+async def checkMessage(client):
     while True:
         msg = redis.zrange(messageRedisKey, 0, 0, withscores=True)
         if msg:
@@ -594,7 +596,7 @@ async def checkMessage():
             msg = msg[0].decode().split(",")
             try:
                 if int(time.time()) - score >= 0:
-                    await bot.delete_messages(entity=int(msg[0]), message_ids=[int(msg[1])])
+                    await client.delete_messages(entity=int(msg[0]), message_ids=[int(msg[1])])
                     redis.zpopmin(messageRedisKey, 1)
                     continue
             except Exception as e:
@@ -603,6 +605,3 @@ async def checkMessage():
                 await log(f'请联系作者添加未处理异常：{str(e)}')
                 redis.zpopmin(messageRedisKey, 1)
         await sleep(sleepTime)
-
-
-bot.loop.create_task(checkMessage())
