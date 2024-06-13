@@ -375,6 +375,9 @@ async def initConfig(context):
 
 async def getConfigAndDealCommand(context):
     global defaultConfig
+    if redis_status():
+        defaultConfig = redis.get("eat.default-config")
+        defaultConfig = redis.get("eat.default-config").decode() if defaultConfig else defaultdict
     properties = {
         "diuRound": False,
         "isRandomAngle": False,
