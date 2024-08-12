@@ -80,20 +80,20 @@ async def getExpiredTime4ChatId(chatId):
 将消息id存入redis有序队列按发送时间排序，之后每隔一段时间获取队列中要到期的消息然后删除。
 
 说明：
-sfd [ chatId ]，查看当前会话设置或者指定chatId
-sfd time 60，设置检查过期间隔时间为60秒，默认为60秒
-sfd exp 60 [ chatId ]，设置过期时间为60秒（后面可选指定id），默认为1800秒（30分钟）
-sfd { on | off } [ chatId ]，设置当前会话开启/关闭自毁，或者指定id，默认所有非私聊会话自动开启，私聊自动关闭
-sfd pin，回复一条自己发的消息，该消息将不会被删除
-sfd { ! | ！ }，查看禁用自毁会话列表
-sfd his [ chatId ]，删除指定会话所有历史消息或当前会话
-sfd reset，重置所有配置
+sfd [ chatId ]，查看当前会话设置或者指定chatId。
+sfd time 60，设置检查过期间隔时间为60秒，默认为60秒。
+sfd exp 60/- [ chatId ]，设置过期时间为60秒（后面可选指定id），默认为1800秒（30分钟）。时间写-号则删除配置。
+sfd { on | off } [ chatId ]，设置当前会话开启/关闭自毁，或者指定id，默认所有非私聊会话自动开启，私聊自动关闭。
+sfd pin，回复一条自己发的消息，该消息将不会被删除。
+sfd { ! | ！ }，查看禁用自毁会话列表。
+sfd his [ chatId ]，删除指定会话所有历史消息或当前会话。
+sfd reset，重置所有配置。
 
 sfd trace < emoji > [ keyword ]，设置自动点赞，如果回复一条消息发送emoji，则对那个人自动点赞；如果发送一个\
 关键字，则根据关键字进行自动点赞，根据是否回复他人决定是否是全局关键字（如果有回复则设置回复消息所在聊天的关\
 键字，否则就是全局关键字）；要删除用-号：-[keyword]；支持正则了，只需要keyword传入 reg/正则表达式 即可。
-sfd trace gm { true | false }，开关全局匹配，效果就是同一条消息触发多个点赞
-sfd trace reset，重置自动点赞所有配置
+sfd trace gm { true | false }，开关全局匹配，效果就是同一条消息触发多个点赞。
+sfd trace reset，重置自动点赞所有配置。
 """,
           parameters="")
 async def selfDestruct(context):
@@ -134,11 +134,15 @@ async def selfDestruct(context):
             return
     elif p[0] == "exp":
         chatId = ""
+        isDelete = False
         try:
             expiredTime4Chat = int(p[1])
         except:
-            await context.edit("设置过期时间参数错误，请输入数字")
-            return
+            if p[1] == "-":
+                isDelete = True
+            else:
+                await context.edit("设置过期时间参数错误，请输入数字")
+                return
         if len(p) >= 3:
             try:
                 chatId = f':{int(p[2])}'
@@ -146,8 +150,12 @@ async def selfDestruct(context):
                 await context.edit("指定chatId格式错误，请输入数字")
                 return
         if chatId:
-            redis.set(f'{messageExpiredRedisKey}{chatId}', expiredTime4Chat)
-            await context.edit(f"设置 `{chatId[1:]}` 过期时间为{expiredTime4Chat}秒")
+            if isDelete:
+                redis.delete(f'{messageExpiredRedisKey}{chatId}')
+                await context.edit(f"删除 `{chatId[1:]}` 过期时间成功")
+            else:
+                redis.set(f'{messageExpiredRedisKey}{chatId}', expiredTime4Chat)
+                await context.edit(f"设置 `{chatId[1:]}` 过期时间为{expiredTime4Chat}秒")
         else:
             redis.set(messageExpiredRedisKey, expiredTime4Chat)
             expiredTime = expiredTime4Chat
