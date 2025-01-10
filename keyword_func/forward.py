@@ -80,7 +80,8 @@ async def main(context, sender_ids, forward_target, prefix, waitResponse):
             except:
                 s = traceback.format_exc()
                 await context.client.send_message(context.chat_id, f"{s}\n以下是目标消息：{target}")
-            await sleep(5)
+            if not waitResponse:
+                await sleep(5)
             await context.delete()
 
     return ""
