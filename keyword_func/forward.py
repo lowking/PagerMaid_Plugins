@@ -65,8 +65,10 @@ async def main(context, sender_ids, forward_target, prefix, waitResponse):
                     async with bot.conversation(entity=forward_target, timeout=10, exclusive=False) as conversation:
                         isNeedDeal = await forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, sourceCmd, target, conversation)
                         chat_response = await conversation.get_response()
-                        await chat_response.forward_to(context.chat_id)
+                        resp = await chat_response.forward_to(context.chat_id)
                         await bot.send_read_acknowledge(conversation.chat_id)
+                        await sleep(5)
+                        await context.client.delete_messages(context.chat_id, resp)
                 else:
                     isNeedDeal = await forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, sourceCmd, target, None)
                 if not isNeedDeal:
