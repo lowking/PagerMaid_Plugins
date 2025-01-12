@@ -63,14 +63,18 @@ async def main(context, sender_ids, forward_target, prefix, waitResponse):
             try:
                 if waitResponse:
                     async with bot.conversation(entity=forward_target, timeout=10, exclusive=False) as conversation:
-                        isNeedDeal = await forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, sourceCmd, target, conversation)
-                        chat_response = await conversation.get_response()
+                        isNeedDeal, previous = await forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, sourceCmd, target)
+                        if not isNeedDeal:
+                            previous = await conversation.send_message(target)
+                            await context.edit(f"转发成功")
+                            isNeedDeal = True
+                        chat_response = await conversation.get_response(message=previous, timeout=10)
                         resp = await chat_response.forward_to(context.chat_id)
                         await bot.send_read_acknowledge(conversation.chat_id)
                         await sleep(5)
                         await context.client.delete_messages(context.chat_id, resp)
                 else:
-                    isNeedDeal = await forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, sourceCmd, target, None)
+                    isNeedDeal, previous = await forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, sourceCmd, target)
                 if not isNeedDeal:
                     await target.forward_to(forward_target)
                     await context.edit(f"转发成功")
@@ -87,8 +91,9 @@ async def main(context, sender_ids, forward_target, prefix, waitResponse):
     return ""
 
 
-async def forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, sourceCmd, target, conversation):
+async def forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, sourceCmd, target):
     isNeedDeal = True
+    previous = 0
     resultMsg = make_reply_msg(context, target.text, prefix).strip()
     if target.media is not None and not isinstance(target.media, MessageMediaWebPage):
         try:
@@ -107,7 +112,7 @@ async def forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, s
                 with open(photo.name, "wb") as f:
                     f.write(photo.getvalue())
                 await context.edit(f"{sourceCmd}下载图片完成")
-                await bot.send_file(forward_target, photo.name, caption=resultMsg, force_document=False)
+                previous = await bot.send_file(forward_target, photo.name, caption=resultMsg, force_document=False)
                 await context.edit(f"转发成功")
                 remove(photo.name)
             else:
@@ -132,7 +137,7 @@ async def forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, s
                 with open(file.name, "wb") as f:
                     f.write(file.getvalue())
                 await context.edit(f"{sourceCmd}下载图片文件完成")
-                await bot.send_file(forward_target, file.name, caption=resultMsg, force_document=True)
+                previous = await bot.send_file(forward_target, file.name, caption=resultMsg, force_document=True)
                 await context.edit(f"转发成功")
                 remove(file.name)
             else:
@@ -161,7 +166,7 @@ async def forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, s
                 with open(file.name, "wb") as f:
                     f.write(file.getvalue())
                 await context.edit(f"{sourceCmd}下载文件完成")
-                await bot.send_file(forward_target, file.name, caption=resultMsg)
+                previous = await bot.send_file(forward_target, file.name, caption=resultMsg)
                 await context.edit(f"转发成功")
                 remove(file.name)
             else:
@@ -172,9 +177,6 @@ async def forwardMessage(context, forward_target, isSourceCmdNotEmpty, prefix, s
             isNeedDeal = False
     else:
         await context.edit(f"{sourceCmd}识别到纯文本")
-        if conversation is None:
-            await context.client.send_message(forward_target, resultMsg)
-        else:
-            await conversation.send_message(resultMsg)
+        previous = await context.client.send_message(forward_target, resultMsg)
         await context.edit(f"转发成功")
-    return isNeedDeal
+    return isNeedDeal, previous
