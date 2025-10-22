@@ -932,7 +932,7 @@
         },
         {
             "name": "selfDestruct",
-            "version": "1.6",
+            "version": "1.8",
             "section": "chat",
             "maintainer": "lowking",
             "size": "23 kb",

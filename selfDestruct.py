@@ -596,20 +596,25 @@ async def sendReaction(client, chatId, messageId, emoticon):
 
 @AsyncTask(name="checkMessage")
 async def checkMessage(client):
+    realSleepTime = 0
     while True:
+        realSleepTime = sleepTime
         msg = redis.zrange(messageRedisKey, 0, 0, withscores=True)
         if msg:
             msg = msg[0]
             score = int(msg[1])
             msg = msg[0].decode().split(",")
             try:
-                if int(time.time()) - score >= 0:
+                remaining = int(time.time()) - score
+                if remaining >= 0:
                     await client.delete_messages(entity=int(msg[0]), message_ids=[int(msg[1])])
                     redis.zpopmin(messageRedisKey, 1)
                     continue
+                else:
+                    realSleepTime = remaining
             except Exception as e:
                 if str(e).startswith("Cannot find any entity corresponding to"):
                     continue
                 await log(f'请联系作者添加未处理异常：{str(e)}')
                 redis.zpopmin(messageRedisKey, 1)
-        await sleep(sleepTime)
+        await sleep(realSleepTime)
