@@ -21,6 +21,8 @@ redisExpiredTime = redis.get(messageExpiredRedisKey)
 expiredTime = 1800 if not redisExpiredTime else int(redisExpiredTime.decode())
 redisSleepTime = redis.get(sleepTimeRedisKey)
 sleepTime = 60 if not redisSleepTime else int(redisSleepTime.decode())
+maxExpiredTime = 999999999
+lastExpiredTime = maxExpiredTime
 ignoreChat = ""
 allowPrivateChat = ""
 traceKeywordsDict = defaultdict()
@@ -509,6 +511,7 @@ async def delayDelete(context):
 
 @listener(incoming=False, outgoing=True, ignore_edited=True)
 async def dealWithMessage4Sfd(context):
+    global lastExpiredTime
     chatId = context.chat_id
     msgId = context.message.id
     isAllowPublicChat = f',{chatId},' not in f'{ignoreChat},'
@@ -516,6 +519,9 @@ async def dealWithMessage4Sfd(context):
     isAllow = isAllowPublicChat if f'{chatId}'.startswith("-100") else isAllowPrivateChat
     if isAllow:
         expiredTime4Chat = await getExpiredTime4ChatId(chatId)
+        # 近期最少的过期时间 
+        if expiredTime4Chat < lastExpiredTime:
+            lastExpiredTime = expiredTime4Chat
         redis.zadd(messageRedisKey, {f"{chatId},{msgId},{context.text}": int(time.time()) + expiredTime4Chat})
 
 
@@ -596,7 +602,7 @@ async def sendReaction(client, chatId, messageId, emoticon):
 
 @AsyncTask(name="checkMessage")
 async def checkMessage(client):
-    realSleepTime = 0
+    global lastExpiredTime
     while True:
         realSleepTime = sleepTime
         msg = redis.zrange(messageRedisKey, 0, 0, withscores=True)
@@ -611,10 +617,13 @@ async def checkMessage(client):
                     redis.zpopmin(messageRedisKey, 1)
                     continue
                 else:
-                    realSleepTime = remaining
+                    # 未有过期的,则判断本次sleep时间,如果下一条消息的过期时间比本周期内最少的还小则使用
+                    realSleepTime = remaining if remaining <= lastExpiredTime else lastExpiredTime
             except Exception as e:
                 if str(e).startswith("Cannot find any entity corresponding to"):
                     continue
                 await log(f'请联系作者添加未处理异常：{str(e)}')
                 redis.zpopmin(messageRedisKey, 1)
+        # 每个周期重置
+        lastExpiredTime = maxExpiredTime
         await sleep(realSleepTime)
