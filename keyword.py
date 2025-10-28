@@ -345,7 +345,13 @@ async def send_reply(chat_id, trigger, mode, reply_msg, context):
                     update_last_time = True
                     re_data = re_msg.split(" ")
                     re_data[0] = " ".join(re_data[0:-1])
-                    re_data[1] = re_data[-1:][0].split("/")[-2:]
+                    # 添加self支持, 意为触发的消息当作文件/图片的获取来源
+                    if re_data[1] == "self":
+                        re_data[1] = "0 0".split(" ")
+                        re_data[1][0] = chat.id
+                        re_data[1][1] = context.id
+                    else:
+                        re_data[1] = re_data[-1:][0].split("/")[-2:]
                     cache_exists, filename = has_cache(chat_id, mode, trigger, re_data[0])
                     is_opened = cache_opened(chat_id, mode, trigger)
                     _data = BytesIO()
